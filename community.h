@@ -1,31 +1,26 @@
 #ifndef COMMUNITY_H
 #define COMMUNITY_H
 
-#include "ant.h"
-#include "nest.h"
 #include <string>
 #include <vector>
+#include "world.h"
 
 using namespace std;
+
+class World;
 
 class Community {
   static int sequence;
   int nserie;
-  Nest *nest;
 
-  vector<Ant *> ants;
+  World *world;
 
 public:
-  Community(Nest *n);
-  const Nest *getNest() const;
+  Community(World *w);
   string toString() const;
   int get_nserie() const { return nserie; }
 
-  // void set_energy_nest(int e);
-
-  void add_to_ants(Ant *a);
-
-  vector<Ant *> get_ants() { return ants; }
+  World *get_world() { return world; }
 };
 
 #endif

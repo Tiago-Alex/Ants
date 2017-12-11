@@ -2,17 +2,18 @@
 #define WORLD_H
 
 #include "community.h"
-#include "nest.h"
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 using namespace std;
 
+class Community;
+
 class World {
   int width, height;
 
-  vector<Community> communities;
+  vector<Community *> communities;
 
 public:
   World(int, int);
@@ -22,15 +23,13 @@ public:
 
   int get_perc_transfered_to_ant(int n);
 
-  void readfromFile();
-
   int window_width() { return width; }
 
   int window_height() { return height; }
 
-  void add_to_communities(Community c);
+  void add_to_world(Community *c);
 
-  vector<Community> get_communities() { return communities; }
+  vector<Community *> get_communities() { return communities; }
 };
 
 #endif

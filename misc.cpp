@@ -1,3 +1,8 @@
+#include "community.h"
+#include "main.h"
+#include "nest.h"
+#include "world.h"
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -9,18 +14,19 @@ vector<string> split_string_into_vector(string str) {
   istringstream ss(str);
   string token;
 
-  while (std::getline(ss, token, ' ')) {
+  while (getline(ss, token, ' ')) {
     result.push_back(token);
   }
   return result;
 }
 
-void handle_command(string cmd) {
+void handle_command(string cmd, World *w) {
 
   vector<string> arg = split_string_into_vector(cmd);
 
   if (arg[0] == "ninho") {
-    cout << arg[1] << endl;
+    Community *community = new Community(NULL);
+    new Nest(stoi(arg[1]), stoi(arg[2]), community);
   } else if (arg[0] == "criaf") {
     cout << arg[1] << endl;
   } else if (arg[0] == "tempo") {
@@ -50,5 +56,20 @@ void handle_command(string cmd) {
     cout << "sair -> termina o programa" << endl << endl;
   } else {
     cout << cmd << " : Comando nao reconhecido" << endl << endl;
+  }
+}
+
+void read_commands_from_file(string filename, World *w) {
+  ifstream file(filename);
+
+  if (file.is_open()) {
+
+    string comand;
+    while (getline(file, comand)) {
+      cout << comand << endl;
+      handle_command(comand, w);
+    }
+  } else {
+    cout << "Nao foi possivel abrir o ficheiro" << endl;
   }
 }

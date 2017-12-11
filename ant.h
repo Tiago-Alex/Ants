@@ -7,21 +7,23 @@
 
 using namespace std;
 
+class Nest;
+
 class Ant {
-  int x, y, energy;
+  int x, y, energy = 0;
   static int sequence;
-  const int nserie;
+const int nserie;
 
   Nest *nest;
 
 public:
   Ant(int x, int y, Nest *n);
 
-  int getEnergy() const { return energy; }
+  int get_energy() const { return energy; }
 
-  int getX() const { return x; }
+  int get_x() const { return x; }
 
-  int getY() const { return y; }
+  int get_y() const { return y; }
 
   int get_nserie() const { return nserie; }
 

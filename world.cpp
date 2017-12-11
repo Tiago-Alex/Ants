@@ -1,6 +1,6 @@
+#include "community.h"
 #include "misc.h"
 #include "world.h"
-#include "community.h"
 #include <iostream>
 
 using namespace std;
@@ -19,15 +19,4 @@ int World::get_perc_tocreate_new_ant(int n) { return n; }
 
 int World::get_perc_transfered_to_ant(int n) { return n; }
 
-void World::readfromFile() {
-  string line;
-  ifstream f("FileName.txt");
-  if (f.is_open()) {
-    while (getline(f, line))
-      handle_command(line);
-    f.close();
-  } else
-    cout << "Unable to open file";
-}
-
-void World::add_to_communities(Community c) { communities.push_back(c); }
+void World::add_to_world(Community *c) { communities.push_back(c); }

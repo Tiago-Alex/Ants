@@ -18,6 +18,6 @@ $(PRGM): $(OBJS)
 	$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
 
 clean:
-	rm -f $(OBJS) $(DEPS) $(PRGM).exe
+	rm -f $(OBJS) $(DEPS) $(PRGM).exe *.gch
 
 -include $(DEPS)
