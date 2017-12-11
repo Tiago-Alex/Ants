@@ -1,3 +1,4 @@
+#include "ant.h"
 #include "nest.h"
 #include <iostream>
 #include <sstream>

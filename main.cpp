@@ -1,9 +1,10 @@
+#include "ant.h"
 #include "community.h"
 #include "consola.h"
-#include "exploring_ant.h"
 #include "misc.h"
 #include "world.h"
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -18,26 +19,27 @@ int main(int argc, char *argv[]) {
   Consola::clrscr();
   cin.ignore(cin.rdbuf()->in_avail());
 
-  Nest a(2, 2);
-  ExploringAnt f(3, 3, &a);
+  Nest *a = new Nest(2, 2);
+  Nest *b = new Nest(1, 0);
 
-  Nest b(0, 1);
+  Ant *z = new Ant(3, 3, a);
+  Ant *x = new Ant(2, 0, a);
+  Ant *v = new Ant(1, 2, a);
 
-  Community c(&a);
+  Community *c = new Community(a);
 
-  c.add_to_nests(a);
-  c.add_to_nests(b);
+  c->add_to_ants(z);
+  c->add_to_ants(x);
+  c->add_to_ants(v);
 
-  cout << a.toString() << endl;
-  cout << b.toString() << endl;
-  cout << c.toString() << endl;
-  cout << f.toString() << endl;
+  cout << a->toString() << endl;
+  cout << b->toString() << endl;
+  cout << c->toString() << endl;
 
-  vector<Nest> nests = c.get_nests();
+  vector<Ant *> ants = c->get_ants();
 
-  for (int i = 0; i < (int)nests.size(); i++) {
-    cout << nests[i].toString() << endl;
-  }
+  for (int i = 0; i < (int)ants.size(); i++)
+    cout << "Ant ->" << ants[i]->get_nserie() << endl;
 
   cout << "Digite [help] para ver a lista de comandos disponiveis" << endl
        << endl;

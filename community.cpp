@@ -10,13 +10,13 @@ const Nest *Community::getNest() const { return nest; }
 
 string Community::toString() const {
   ostringstream os;
-  os << "Comunidade: " << getNSerie() << nest->toString() << endl;
+  os << "Comunidade: " << get_nserie() << nest->toString() << endl;
   return os.str();
 }
 
-void Community::add_to_nests(Nest n) { nests.push_back(n); }
+// void Community::set_energy_nest(int e) {
+//   for (int i = 0; i < (int)nests.size(); i++)
+//     nests[i].setEnergia(e);
+// }
 
-void Community::set_energy_nest(int e) {
-  for (int i = 0; i < (int)nests.size(); i++)
-    nests[i].setEnergia(e);
-}
+void Community::add_to_ants(Ant *a) { ants.push_back(a); }

@@ -1,6 +1,7 @@
 #ifndef COMMUNITY_H
 #define COMMUNITY_H
 
+#include "ant.h"
 #include "nest.h"
 #include <string>
 #include <vector>
@@ -12,19 +13,19 @@ class Community {
   int nserie;
   Nest *nest;
 
-  vector<Nest> nests;
+  vector<Ant *> ants;
 
 public:
   Community(Nest *n);
   const Nest *getNest() const;
   string toString() const;
-  int getNSerie() const { return nserie; }
+  int get_nserie() const { return nserie; }
 
-  void add_to_nests(Nest n);
+  // void set_energy_nest(int e);
 
-  vector<Nest> get_nests() { return nests; }
+  void add_to_ants(Ant *a);
 
-  void set_energy_nest(int e);
+  vector<Ant *> get_ants() { return ants; }
 };
 
 #endif

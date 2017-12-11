@@ -1,6 +1,7 @@
 #ifndef WORLD_H
 #define WORLD_H
 
+#include "community.h"
 #include "nest.h"
 #include <fstream>
 #include <iostream>
@@ -10,6 +11,8 @@ using namespace std;
 
 class World {
   int width, height;
+
+  vector<Community> communities;
 
 public:
   World(int, int);
@@ -24,6 +27,10 @@ public:
   int window_width() { return width; }
 
   int window_height() { return height; }
+
+  void add_to_communities(Community c);
+
+  vector<Community> get_communities() { return communities; }
 };
 
 #endif

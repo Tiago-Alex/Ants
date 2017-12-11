@@ -1,5 +1,6 @@
 #include "misc.h"
 #include "world.h"
+#include "community.h"
 #include <iostream>
 
 using namespace std;
@@ -28,3 +29,5 @@ void World::readfromFile() {
   } else
     cout << "Unable to open file";
 }
+
+void World::add_to_communities(Community c) { communities.push_back(c); }
