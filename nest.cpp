@@ -4,10 +4,10 @@
 
 int Nest::sequence = 0;
 
-Nest::Nest(int x, int y, Community *c) : nserie(sequence++) {
+Nest::Nest(int x, int y, World *w) : nserie(sequence++) {
   this->x = x;
   this->y = y;
-  community = c;
+  world = w;
 }
 
 string Nest::toString() const {

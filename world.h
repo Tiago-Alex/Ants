@@ -1,19 +1,19 @@
 #ifndef WORLD_H
 #define WORLD_H
 
-#include "community.h"
+#include "nest.h"
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 using namespace std;
 
-class Community;
+class Nest;
 
 class World {
   int width, height;
 
-  vector<Community *> communities;
+  vector<Nest *> nests;
 
 public:
   World(int, int);
@@ -27,9 +27,9 @@ public:
 
   int window_height() { return height; }
 
-  void add_to_world(Community *c);
+  vector<Nest *> get_nests() { return nests; }
 
-  vector<Community *> get_communities() { return communities; }
+  void add_nest(Nest *n);
 };
 
 #endif

@@ -1,4 +1,3 @@
-#include "community.h"
 #include "misc.h"
 #include "world.h"
 #include <iostream>
@@ -19,4 +18,4 @@ int World::get_perc_tocreate_new_ant(int n) { return n; }
 
 int World::get_perc_transfered_to_ant(int n) { return n; }
 
-void World::add_to_world(Community *c) { communities.push_back(c); }
+void World::add_nest(Nest *n) { nests.push_back(n); }
