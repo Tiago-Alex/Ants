@@ -8,11 +8,13 @@ using namespace std;
 
 int Ant::sequence = 0;
 
-Ant::Ant(int x, int y, Nest *n) : nserie(sequence++) {
+Ant::Ant(int x, int y, int type, Nest *n) : nserie(sequence++) {
   this->x = x;
   this->y = y;
+  this->type = type;
   nest = n;
-  nest->add_to_nest(this);
+  /* Add ant to the nest on ant creation, so the nest store his ants */
+  nest->add_ant(this);
 }
 
 string Ant::toString() {

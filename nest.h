@@ -36,7 +36,7 @@ public:
 
   void set_energy(int e);
 
-  void add_to_nest(Ant *a);
+  void add_ant(Ant *a);
 
   vector<Ant *> get_ants() { return ants; }
 };

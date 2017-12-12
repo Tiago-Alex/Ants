@@ -10,14 +10,14 @@ using namespace std;
 class Nest;
 
 class Ant {
-  int x, y, energy = 0;
+  int x, y, energy = 0, type;
   static int sequence;
-const int nserie;
+  const int nserie;
 
   Nest *nest;
 
 public:
-  Ant(int x, int y, Nest *n);
+  Ant(int x, int y, int type, Nest *n);
 
   int get_energy() const { return energy; }
 

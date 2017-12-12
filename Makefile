@@ -12,7 +12,6 @@ all: $(PRGM)
 
 $(PRGM): $(OBJS)
 	$(CXX) $(OBJS) $(LDLIBS) -o $@
-	start $(PRGM).exe
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@

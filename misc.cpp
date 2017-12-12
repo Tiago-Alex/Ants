@@ -7,11 +7,9 @@
 
 using namespace std;
 
-void list_nest(World *w) {
-  vector<Nest *> n = w->get_nests();
-  for (int i = 0; i < (int)n.size(); i++) {
-    cout << endl << n[i]->toString() << endl;
-  }
+void list_nest(World *w, int key) {
+  Nest *nest = w->get_nest_from_id(key);
+  cout << nest->toString() << endl;
 }
 
 void list_world(World *w) {
@@ -38,19 +36,24 @@ void handle_command(string cmd, World *w) {
 
   if (arg[0] == "ninho") {
     /* Send the world as parameter so the nest know his world */
-    Nest *n = new Nest(stoi(arg[1]), stoi(arg[2]), w);
-    /* Add nest to the world, so the world store his nests */
-    w->add_nest(n);
+    new Nest(stoi(arg[1]), stoi(arg[2]), w);
     cout << "Ninho criado com sucesso" << endl << endl;
   } else if (arg[0] == "criaf") {
-    cout << arg[1] << endl;
+    /*arg[1] -> F formigas
+    arg[2] -> T tipo
+    arg[3] -> N Ninho
+    nota: posições aleatorias vazias */
+    Nest *n = new Nest(stoi(arg[1]), stoi(arg[2]), w);
+    new Ant(stoi(arg[1]), stoi(arg[2]), 1, n);
+    cout << "Formiga criada com sucesso" << endl << endl;
   } else if (arg[0] == "tempo") {
     cout << arg[1] << endl;
   } else if (arg[0] == "listamundo") {
     list_world(w);
     cout << "Mundo listado com sucesso" << endl << endl;
   } else if (arg[0] == "listaninho") {
-    list_nest(w);
+    list_nest(w, stoi(arg[1]));
+    cout << "Ninho listado com sucesso" << endl;
   } else if (arg[0] == "listaposicao") {
     cout << arg[1] << endl;
   } else if (arg[0] == "sair") {

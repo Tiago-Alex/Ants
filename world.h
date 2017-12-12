@@ -30,6 +30,8 @@ public:
   vector<Nest *> get_nests() { return nests; }
 
   void add_nest(Nest *n);
+
+  Nest *get_nest_from_id(int id);
 };
 
 #endif
