@@ -1,6 +1,8 @@
 #include "misc.h"
 #include "world.h"
 #include <iostream>
+#include <iterator>
+#include <sstream>
 
 using namespace std;
 
@@ -14,10 +16,6 @@ void World::set_window_size(int x, int y) {
   height = y;
 }
 
-int World::get_perc_tocreate_new_ant(int n) { return n; }
-
-int World::get_perc_transfered_to_ant(int n) { return n; }
-
 void World::add_nest(Nest *n) { nests.push_back(n); }
 
 Nest *World::get_nest_from_id(int id) {
@@ -27,4 +25,17 @@ Nest *World::get_nest_from_id(int id) {
     }
   }
   return NULL;
+}
+
+const string World::get_elements() {
+
+  vector<string> nests_list;
+  for (int i = 0; i < (int)nests.size(); i++) {
+    nests_list.push_back(nests[i]->get_info());
+  }
+  ostringstream ss;
+
+  copy(nests_list.begin(), nests_list.end(), ostream_iterator<string>(ss, "\n"));
+
+  return ss.str();
 }

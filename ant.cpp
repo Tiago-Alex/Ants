@@ -8,7 +8,7 @@ using namespace std;
 
 int Ant::sequence = 0;
 
-Ant::Ant(int x, int y, int type, Nest *n) : nserie(sequence++) {
+Ant::Ant(int x, int y, const char *type, Nest *n) : nserie(sequence++) {
   this->x = x;
   this->y = y;
   this->type = type;
@@ -17,10 +17,10 @@ Ant::Ant(int x, int y, int type, Nest *n) : nserie(sequence++) {
   nest->add_ant(this);
 }
 
-string Ant::toString() {
+string Ant::get_info() {
   ostringstream os;
-  os << "Formiga: " << get_nserie() << "Posicao:(" << get_x() << "," << get_y()
-     << ")"
-     << "Energia: " << get_energy() << endl;
+  os << "Formiga: " << get_nserie() << endl
+     << "\tPosicao: (" << get_x() << "," << get_y() << ")" << endl
+     << "\tEnergia: " << get_energy() << endl;
   return os.str();
 }

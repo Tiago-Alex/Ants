@@ -16,22 +16,20 @@ class World {
   vector<Nest *> nests;
 
 public:
-  World(int, int);
-  void set_window_size(int, int);
+  World(int x, int y);
+  void set_window_size(int x, int y);
 
-  int get_perc_tocreate_new_ant(int n);
+  int get_window_width() { return width; }
 
-  int get_perc_transfered_to_ant(int n);
-
-  int window_width() { return width; }
-
-  int window_height() { return height; }
+  int get_window_height() { return height; }
 
   vector<Nest *> get_nests() { return nests; }
 
   void add_nest(Nest *n);
 
   Nest *get_nest_from_id(int id);
+
+  const string get_elements();
 };
 
 #endif

@@ -13,7 +13,7 @@ class Ant;
 class World;
 
 class Nest {
-  int x, y, energy = 0;
+  int x, y, energy = 0, penergy = 0, uenergy = 1;
   const int nserie;
   static int sequence;
 
@@ -30,11 +30,19 @@ public:
 
   int get_energy() const { return energy; }
 
+  int get_penergy() const { return penergy; }
+
+  int get_uenergy() const { return uenergy; }
+
   int get_nserie() const { return nserie; }
 
-  string toString() const;
+  string get_info() const;
 
   void set_energy(int e);
+
+  void set_penergy(int p);
+
+  void set_uenergy(int u);
 
   void add_ant(Ant *a);
 
