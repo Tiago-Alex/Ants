@@ -141,15 +141,31 @@ bool define_world_size(int size, World *w) {
 
 void help() {
   cout << endl << "Comandos disponiveis : " << endl << endl;
-  cout << "ninho -> cria um ninho" << endl;
-  cout << "criaf -> cria formigas" << endl;
-  cout << "tempo -> avanca uma iteracao" << endl;
-  cout << "listamundo -> lista elementos do mundo" << endl;
-  cout << "listaninho -> lista toda a informacao relacionada com o ninho"
+  cout << endl << "Fase de simulacao" << endl << endl;
+  cout << "\tdefmundo <limite> -> Define a dimensao do mundo como uma grelha "
+          "bidimensional. Limite >=10"
        << endl;
-  cout << "listaposicao -> lista toda a informacao relacionada com a posicao"
+  cout << "\tdefen <energia> -> Define o valor inicial de energia dos ninhos"
        << endl;
-  cout << "sair -> termina o programa" << endl << endl;
+  cout << "\tdefpc <valor> -> Define a percetagem de energia inicial do ninho"
+       << endl;
+  cout << "\texecuta <nomeFicheiro> -> Le comandos a partir de um ficheiro de "
+          "texto"
+       << endl;
+  cout << "\tinicio -> Se todos os parametros da configuracao foram executados "
+          "termina a configuracao e passa a execucao"
+       << endl;
+  cout << endl << "Fase de simulacao" << endl << endl;
+  cout << "\tninho <linha> <coluna> -> cria um ninho" << endl;
+  cout << "\tcriaf <F> <T> <N> -> cria formigas" << endl;
+  cout << "\ttempo -> avanca uma iteracao" << endl;
+  cout << "\tlistamundo -> lista elementos do mundo" << endl;
+  cout << "\tlistaninho <N> -> lista toda a informacao relacionada com o ninho"
+       << endl;
+  cout << "\tlistaposicao <linha> <coluna> -> lista toda a informacao "
+          "\trelacionada com a posicao"
+       << endl;
+  cout << endl << "sair -> termina o programa" << endl << endl;
 }
 
 void start(World *w) {
