@@ -10,7 +10,7 @@ using namespace std;
 class Nest;
 
 class Ant {
-  int x, y, energy = 0;
+  int x, y, energy = 200;
   const char *type;
   static int sequence;
   const int nserie;
@@ -29,6 +29,10 @@ public:
   int get_nserie() const { return nserie; }
 
   std::string get_info();
+
+  void set_x(int x);
+
+  void set_y(int y);
 };
 
 #endif

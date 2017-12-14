@@ -7,15 +7,20 @@
 
 using namespace std;
 
-void read_commands_from_file(string filename, World *w);
-void handle_command(string cmd, World *w);
+bool read_commands_from_file(string filename, World *w);
+bool handle_command(string cmd, World *w);
 void start(World *w);
 void help();
 bool define_world_size(int size, World *w);
+bool create_nest(int x, int y, World *w);
 bool create_ant(World *w, const char *type, int n);
-int random_number_in_range(int nMin, int nMax);
+int random_number(int max);
+void list_ants(World *w);
 vector<string> split_string_into_vector(string str);
 void list_world(World *w);
+bool list_position(int x, int y, World *w);
+vector<pair<int, int>> get_empty_positions(World *w);
+vector<pair<int, int>> get_occupied_positions(World *w);
 bool list_nest(World *w, int key);
 bool check_args(vector<string> arg, int n);
 bool define_nests_uenergy(int uenergy, World *w);

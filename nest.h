@@ -47,6 +47,8 @@ public:
   void add_ant(Ant *a);
 
   vector<Ant *> get_ants() { return ants; }
+
+  void move_ants();
 };
 
 #endif

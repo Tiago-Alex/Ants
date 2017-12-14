@@ -35,7 +35,14 @@ const string World::get_elements() {
   }
   ostringstream ss;
 
-  copy(nests_list.begin(), nests_list.end(), ostream_iterator<string>(ss, "\n"));
+  copy(nests_list.begin(), nests_list.end(),
+       ostream_iterator<string>(ss, "\n"));
 
   return ss.str();
 }
+
+void World::set_default_energy(int e) { energy = e; }
+
+void World::set_default_penergy(int p) { penergy = p; }
+
+void World::set_default_uenergy(int u) { uenergy = u; }

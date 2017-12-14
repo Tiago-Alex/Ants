@@ -7,50 +7,30 @@
 #include <iostream>
 #include <random>
 #include <sstream>
+#include <time.h>
 #include <vector>
 
-bool define_nests_energy(int energy, World *w) {
+bool move_ants(World *w) {
   vector<Nest *> nests = w->get_nests();
-  if (nests.size() > 0) {
-    for (int i = 0; i < (int)nests.size(); i++) {
-      nests[i]->set_energy(energy);
-    }
-    return true;
-  } else {
-    cout << "Nao existem ninhos" << endl;
-    return false;
+  for (int i = 0; i < (int)nests.size(); i++) {
+    nests[i]->move_ants();
   }
+  return true;
+}
+
+bool define_nests_energy(int energy, World *w) {
+  w->set_default_energy(energy);
+  return true;
 }
 
 bool define_nests_penergy(int penergy, World *w) {
-  if (penergy >= 0 && penergy <= 100) {
-    vector<Nest *> nests = w->get_nests();
-    if (nests.size() > 0) {
-      for (int i = 0; i < (int)nests.size(); i++) {
-        nests[i]->set_penergy(penergy);
-      }
-      return true;
-    } else {
-      cout << "Nao existem ninhos" << endl;
-      return false;
-    }
-  } else {
-    cout << "A percentagem deve estar compreendida entre 0 e 100" << endl;
-    return false;
-  }
+  w->set_default_penergy(penergy);
+  return true;
 }
 
 bool define_nests_uenergy(int uenergy, World *w) {
-  vector<Nest *> nests = w->get_nests();
-  if (nests.size() > 0) {
-    for (int i = 0; i < (int)nests.size(); i++) {
-      nests[i]->set_uenergy(uenergy);
-    }
-    return true;
-  } else {
-    cout << "Nao existem ninhos" << endl;
-    return false;
-  }
+  w->set_default_uenergy(uenergy);
+  return true;
 }
 
 bool check_args(vector<string> arg, int n) {
@@ -91,7 +71,7 @@ vector<pair<int, int>> get_empty_positions(World *w) {
   for (int x = 0; x < w->get_world_width(); x++) {
     for (int y = 0; y < w->get_world_height(); y++) {
       pair<int, int> coordinates(x, y);
-      if ((std::find(occupied.begin(), occupied.end(), coordinates) !=
+      if ((find(occupied.begin(), occupied.end(), coordinates) !=
            occupied.end()) == false) {
         empty.push_back(coordinates);
       }
@@ -144,25 +124,26 @@ void list_ants(World *w) {
   }
 }
 
-int random_number_in_range(int nMin, int nMax) {
-  return nMin + (int)((double)rand() / (RAND_MAX + 1) * (nMax - nMin + 1));
+int random_number(int max) {
+
+  srand(time(NULL));
+
+  return rand() % max + 0;
 }
 
 bool create_ant(World *w, const char *type, int n) {
   if (strcmp(type, "E") == 0) {
     Nest *nest = w->get_nest_from_id(n);
     if (nest != NULL) {
-      
+
       /* How we know empty positions -> we create a vector of pairs(widht,
 height) of all occupied positions, we run a cicle of all possible coordinates
-according to the widht*height and we check if the coordinate is occupied, if not
-we add it to a vector of pairs called the empty positions, next we randomize a
-number from the index of the vector and select from there */
+according to the widht*height and we check if the coordinate is occupied, if
+not we add it to a vector of pairs called the empty positions, next we
+randomize a number from the index of the vector and select from there */
 
       vector<pair<int, int>> empty = get_empty_positions(w);
-      pair<int, int> random =
-          empty[random_number_in_range(0, (int)empty.size())];
-
+      pair<int, int> random = empty[random_number((int)empty.size())];
       new Ant(random.first, random.second, type, nest);
       cout << "Formiga criada com sucesso" << endl << endl;
       return true;
@@ -171,6 +152,20 @@ number from the index of the vector and select from there */
     return false;
   } else {
     cout << "Tipo de formiga invalido" << endl;
+    return false;
+  }
+}
+
+bool create_nest(int x, int y, World *w) {
+  pair<int, int> coordinates(x, y);
+  vector<pair<int, int>> occupied = get_occupied_positions(w);
+  if ((find(occupied.begin(), occupied.end(), coordinates) != occupied.end()) ==
+      false) {
+    new Nest(x, y, w);
+    cout << "Ninho criado com sucesso" << endl << endl;
+    return true;
+  } else {
+    cout << "Essa posicao ja esta ocupada" << endl;
     return false;
   }
 }
@@ -215,18 +210,11 @@ void help() {
   cout << endl << "sair -> termina o programa" << endl << endl;
 }
 
-void start(World *w) {
-  handle_command("executa comands.txt", w);
-  handle_command("defmundo 20", w);
-  handle_command("defen 100", w);
-  handle_command("defpc 50", w);
-  handle_command("defvt 1", w);
-}
+void start(World *w) { handle_command("executa commands.txt", w); }
 
-void handle_command(string cmd, World *w) {
+bool handle_command(string cmd, World *w) {
 
   vector<string> arg = split_string_into_vector(cmd);
-
   if (arg[0] == "executa") {
     if (check_args(arg, 2)) {
       read_commands_from_file(arg[1], w);
@@ -237,33 +225,34 @@ void handle_command(string cmd, World *w) {
     }
   } else if (arg[0] == "defen") {
     if (check_args(arg, 2)) {
-      define_nests_energy(stoi(arg[1]), w);
+      return define_nests_energy(stoi(arg[1]), w);
     }
   } else if (arg[0] == "defpc") {
     if (check_args(arg, 2)) {
-      define_nests_penergy(stoi(arg[1]), w);
+      return define_nests_penergy(stoi(arg[1]), w);
     }
   } else if (arg[0] == "defvt") {
     if (check_args(arg, 2)) {
-      define_nests_uenergy(stoi(arg[1]), w);
+      return define_nests_uenergy(stoi(arg[1]), w);
     }
   } else if (arg[0] == "inicio") {
     start(w);
   } else if (arg[0] == "ninho") {
-    /* Send the world as parameter so the nest know his world */
-    new Nest(stoi(arg[1]), stoi(arg[2]), w);
-    cout << "Ninho criado com sucesso" << endl << endl;
+    if (check_args(arg, 3)) {
+      return create_nest(stoi(arg[1]), stoi(arg[2]), w);
+    }
   } else if (arg[0] == "criaf") {
     if (check_args(arg, 4)) {
       /*arg[1] -> F formigas
       arg[2] -> T tipo
       arg[3] -> N Ninho
       nota: posições aleatorias vazias */
-      for (int i = 0; i < stoi(arg[1]); i++)
+      for (int i = 0; i < stoi(arg[1]); i++) {
         create_ant(w, arg[2].c_str(), stoi(arg[3]));
+      }
     }
   } else if (arg[0] == "tempo") {
-    cout << arg[1] << endl;
+    move_ants(w);
   } else if (arg[0] == "listamundo") {
     list_world(w);
   } else if (arg[0] == "listaninho") {
@@ -279,17 +268,13 @@ void handle_command(string cmd, World *w) {
     exit(0);
   } else if (arg[0] == "help") {
     help();
-  } else if (arg[0] == "occ") {
-    vector<pair<int, int>> occupied = get_occupied_positions(w);
-    for (int i = 0; i < (int)occupied.size(); i++) {
-      cout << occupied[i].first << "," << occupied[i].second << endl;
-    }
   } else {
     cout << cmd << " : Comando nao reconhecido" << endl << endl;
   }
+  return true;
 }
 
-void read_commands_from_file(string filename, World *w) {
+bool read_commands_from_file(string filename, World *w) {
   ifstream file(filename);
 
   if (file.is_open()) {
@@ -299,7 +284,9 @@ void read_commands_from_file(string filename, World *w) {
       cout << comand << endl;
       handle_command(comand, w);
     }
+    return true;
   } else {
     cout << "Nao foi possivel abrir o ficheiro" << endl;
+    return false;
   }
 }

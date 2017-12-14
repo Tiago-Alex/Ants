@@ -24,3 +24,7 @@ string Ant::get_info() {
      << "\tEnergia: " << get_energy() << endl;
   return os.str();
 }
+
+void Ant::set_x(int x) { this->x = x; }
+
+void Ant::set_y(int y) { this->y = y; }

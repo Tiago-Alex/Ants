@@ -1,3 +1,4 @@
-ninho 2 3
-ninho 4 6
-ninho 8 9
+defmundo 20
+defen 100
+defpc 50
+defvt 1
