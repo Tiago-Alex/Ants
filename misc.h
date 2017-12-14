@@ -7,6 +7,9 @@
 
 using namespace std;
 
+bool check_if_number_is_in_range(int number, unsigned int min,
+                                 unsigned int max);
+bool move_ants(World *w);
 bool read_commands_from_file(string filename, World *w);
 bool handle_command(string cmd, World *w);
 void start(World *w);
@@ -19,8 +22,6 @@ void list_ants(World *w);
 vector<string> split_string_into_vector(string str);
 void list_world(World *w);
 bool list_position(int x, int y, World *w);
-vector<pair<int, int>> get_empty_positions(World *w);
-vector<pair<int, int>> get_occupied_positions(World *w);
 bool list_nest(World *w, int key);
 bool check_args(vector<string> arg, int n);
 bool define_nests_uenergy(int uenergy, World *w);

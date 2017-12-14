@@ -42,6 +42,10 @@ public:
   void set_default_penergy(int p);
 
   void set_default_uenergy(int u);
+
+  vector<pair<int, int>> *get_occupied_positions();
+
+  vector<pair<int, int>> *get_empty_positions();
 };
 
 #endif

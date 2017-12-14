@@ -48,7 +48,7 @@ public:
 
   vector<Ant *> get_ants() { return ants; }
 
-  void move_ants();
+  void move_ants_with_range(int range);
 };
 
 #endif

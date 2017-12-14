@@ -36,27 +36,20 @@ void Nest::set_penergy(int p) { penergy = p; }
 
 void Nest::set_uenergy(int u) { uenergy = u; }
 
-bool check_if_number_is_in_range(int number, unsigned int min, unsigned int max) {
-  if ((unsigned)(number - min) <= (max - min)) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-void Nest::move_ants() {
-  vector<pair<int, int>> empty = get_empty_positions(world);
+void Nest::move_ants_with_range(int range) {
+  vector<pair<int, int>> *empty = world->get_empty_positions();
 
   for (int i = 0; i < (int)ants.size(); i++) {
     pair<int, int> ant_position(ants[i]->get_x(), ants[i]->get_y());
     vector<pair<int, int>> empty_in_range;
-    for (int j = 0; j < (int)empty.size(); j++) {
-      if (check_if_number_is_in_range(empty[j].first, (ant_position.first - 8),
-                                      (ant_position.first + 8)) &&
-          check_if_number_is_in_range(empty[j].second,
-                                      (ant_position.second - 8),
-                                      (ant_position.second + 8))) {
-        empty_in_range.push_back(empty[j]);
+    for (int j = 0; j < (int)empty->size(); j++) {
+      if (check_if_number_is_in_range(empty->at(j).first,
+                                      (ant_position.first - range),
+                                      (ant_position.first + range)) &&
+          check_if_number_is_in_range(empty->at(j).second,
+                                      (ant_position.second - range),
+                                      (ant_position.second + range))) {
+        empty_in_range.push_back(empty->at(j));
       }
     }
     if (empty_in_range.size() > 0) {

@@ -10,10 +10,19 @@
 #include <time.h>
 #include <vector>
 
+bool check_if_number_is_in_range(int number, unsigned int min,
+                                 unsigned int max) {
+  if ((unsigned)(number - min) <= (max - min)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 bool move_ants(World *w) {
   vector<Nest *> nests = w->get_nests();
   for (int i = 0; i < (int)nests.size(); i++) {
-    nests[i]->move_ants();
+    nests[i]->move_ants_with_range(8);
   }
   return true;
 }
@@ -50,34 +59,6 @@ bool list_nest(World *w, int key) {
     cout << "Ninho nao encontrado" << endl;
     return false;
   }
-}
-
-vector<pair<int, int>> get_occupied_positions(World *w) {
-  vector<Nest *> nests = w->get_nests();
-  vector<pair<int, int>> occupied;
-  for (int i = 0; i < (int)nests.size(); i++) {
-    occupied.push_back(make_pair(nests[i]->get_x(), nests[i]->get_y()));
-    vector<Ant *> ants = nests[i]->get_ants();
-    for (int j = 0; j < (int)ants.size(); j++) {
-      occupied.push_back(make_pair(ants[j]->get_x(), ants[j]->get_y()));
-    }
-  }
-  return occupied;
-}
-
-vector<pair<int, int>> get_empty_positions(World *w) {
-  vector<pair<int, int>> empty;
-  vector<pair<int, int>> occupied = get_occupied_positions(w);
-  for (int x = 0; x < w->get_world_width(); x++) {
-    for (int y = 0; y < w->get_world_height(); y++) {
-      pair<int, int> coordinates(x, y);
-      if ((find(occupied.begin(), occupied.end(), coordinates) !=
-           occupied.end()) == false) {
-        empty.push_back(coordinates);
-      }
-    }
-  }
-  return empty;
 }
 
 bool list_position(int x, int y, World *w) {
@@ -142,8 +123,8 @@ according to the widht*height and we check if the coordinate is occupied, if
 not we add it to a vector of pairs called the empty positions, next we
 randomize a number from the index of the vector and select from there */
 
-      vector<pair<int, int>> empty = get_empty_positions(w);
-      pair<int, int> random = empty[random_number((int)empty.size())];
+      vector<pair<int, int>> *empty = w->get_empty_positions();
+      pair<int, int> random = empty->at(random_number((int)empty->size()));
       new Ant(random.first, random.second, type, nest);
       cout << "Formiga criada com sucesso" << endl << endl;
       return true;
@@ -158,8 +139,8 @@ randomize a number from the index of the vector and select from there */
 
 bool create_nest(int x, int y, World *w) {
   pair<int, int> coordinates(x, y);
-  vector<pair<int, int>> occupied = get_occupied_positions(w);
-  if ((find(occupied.begin(), occupied.end(), coordinates) != occupied.end()) ==
+  vector<pair<int, int>> *occupied = w->get_occupied_positions();
+  if ((find(occupied->begin(), occupied->end(), coordinates) != occupied->end()) ==
       false) {
     new Nest(x, y, w);
     cout << "Ninho criado com sucesso" << endl << endl;
