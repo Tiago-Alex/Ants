@@ -2,6 +2,7 @@
 #include "misc.h"
 #include "nest.h"
 #include "string.h"
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <random>
@@ -71,6 +72,34 @@ bool list_nest(World *w, int key) {
   }
 }
 
+vector<pair<int, int>> get_occupied_positions(World *w) {
+  vector<Nest *> nests = w->get_nests();
+  vector<pair<int, int>> occupied;
+  for (int i = 0; i < (int)nests.size(); i++) {
+    occupied.push_back(make_pair(nests[i]->get_x(), nests[i]->get_y()));
+    vector<Ant *> ants = nests[i]->get_ants();
+    for (int j = 0; j < (int)ants.size(); j++) {
+      occupied.push_back(make_pair(ants[j]->get_x(), ants[j]->get_y()));
+    }
+  }
+  return occupied;
+}
+
+vector<pair<int, int>> get_empty_positions(World *w) {
+  vector<pair<int, int>> empty;
+  vector<pair<int, int>> occupied = get_occupied_positions(w);
+  for (int x = 0; x < w->get_world_width(); x++) {
+    for (int y = 0; y < w->get_world_height(); y++) {
+      pair<int, int> coordinates(x, y);
+      if ((std::find(occupied.begin(), occupied.end(), coordinates) !=
+           occupied.end()) == false) {
+        empty.push_back(coordinates);
+      }
+    }
+  }
+  return empty;
+}
+
 bool list_position(int x, int y, World *w) {
   vector<Nest *> nests = w->get_nests();
   if (nests.size() > 0) {
@@ -105,6 +134,16 @@ vector<string> split_string_into_vector(string str) {
   return result;
 }
 
+void list_ants(World *w) {
+  vector<Nest *> nests = w->get_nests();
+  for (int i = 0; i < (int)nests.size(); i++) {
+    vector<Ant *> ants = nests[i]->get_ants();
+    for (int j = 0; j < (int)ants.size(); j++) {
+      cout << ants[j]->get_info() << endl;
+    }
+  }
+}
+
 int random_number_in_range(int nMin, int nMax) {
   return nMin + (int)((double)rand() / (RAND_MAX + 1) * (nMax - nMin + 1));
 }
@@ -113,11 +152,18 @@ bool create_ant(World *w, const char *type, int n) {
   if (strcmp(type, "E") == 0) {
     Nest *nest = w->get_nest_from_id(n);
     if (nest != NULL) {
-      /* For now I'm generating a random number from a given range, I'll
-       * change this to put the available coordinates on a vector and select a
-       * random vector position */
-      new Ant(random_number_in_range(0, w->get_window_width()),
-              random_number_in_range(0, w->get_window_height()), type, nest);
+      
+      /* How we know empty positions -> we create a vector of pairs(widht,
+height) of all occupied positions, we run a cicle of all possible coordinates
+according to the widht*height and we check if the coordinate is occupied, if not
+we add it to a vector of pairs called the empty positions, next we randomize a
+number from the index of the vector and select from there */
+
+      vector<pair<int, int>> empty = get_empty_positions(w);
+      pair<int, int> random =
+          empty[random_number_in_range(0, (int)empty.size())];
+
+      new Ant(random.first, random.second, type, nest);
       cout << "Formiga criada com sucesso" << endl << endl;
       return true;
     } else
@@ -131,7 +177,7 @@ bool create_ant(World *w, const char *type, int n) {
 
 bool define_world_size(int size, World *w) {
   if (size >= 10) {
-    w->set_window_size(size, size);
+    w->set_world_size(size, size);
     return true;
   } else {
     cout << "O limite deve ser obrigatoriamente >= 10" << endl;
@@ -152,7 +198,8 @@ void help() {
   cout << "\texecuta <nomeFicheiro> -> Le comandos a partir de um ficheiro de "
           "texto"
        << endl;
-  cout << "\tinicio -> Se todos os parametros da configuracao foram executados "
+  cout << "\tinicio -> Se todos os parametros da configuracao foram "
+          "executados "
           "termina a configuracao e passa a execucao"
        << endl;
   cout << endl << "Fase de simulacao" << endl << endl;
@@ -222,6 +269,8 @@ void handle_command(string cmd, World *w) {
   } else if (arg[0] == "listaninho") {
     if (check_args(arg, 2))
       list_nest(w, stoi(arg[1]));
+  } else if (arg[0] == "listaformigas") {
+    list_ants(w);
   } else if (arg[0] == "listaposicao") {
     if (check_args(arg, 2))
       list_position(stoi(arg[1]), stoi(arg[2]), w);
@@ -230,6 +279,11 @@ void handle_command(string cmd, World *w) {
     exit(0);
   } else if (arg[0] == "help") {
     help();
+  } else if (arg[0] == "occ") {
+    vector<pair<int, int>> occupied = get_occupied_positions(w);
+    for (int i = 0; i < (int)occupied.size(); i++) {
+      cout << occupied[i].first << "," << occupied[i].second << endl;
+    }
   } else {
     cout << cmd << " : Comando nao reconhecido" << endl << endl;
   }

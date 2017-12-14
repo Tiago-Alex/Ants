@@ -17,11 +17,11 @@ class World {
 
 public:
   World(int x, int y);
-  void set_window_size(int x, int y);
+  void set_world_size(int x, int y);
 
-  int get_window_width() { return width; }
+  int get_world_width() { return width; }
 
-  int get_window_height() { return height; }
+  int get_world_height() { return height; }
 
   vector<Nest *> get_nests() { return nests; }
 

@@ -11,7 +11,7 @@ World::World(int x, int y) {
   height = y;
 }
 
-void World::set_window_size(int x, int y) {
+void World::set_world_size(int x, int y) {
   width = x;
   height = y;
 }

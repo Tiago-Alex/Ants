@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
   World *world = new World(30, 120);
 
   Consola::setTextSize(10, 10);
-  Consola::setScreenSize(world->get_window_width(), world->get_window_height());
+  Consola::setScreenSize(world->get_world_width(), world->get_world_height());
   Consola::setBackgroundColor(Consola::AZUL);
   Consola::setTextColor(Consola::AMARELO_CLARO);
   Consola::clrscr();
