@@ -15,6 +15,8 @@ class World {
 
   vector<Nest *> nests;
 
+  vector<string> configured;
+
 public:
   World(int x, int y);
   void set_world_size(int x, int y);
@@ -46,6 +48,10 @@ public:
   vector<pair<int, int>> *get_occupied_positions();
 
   vector<pair<int, int>> *get_empty_positions();
+
+  void set_configured(string command);
+
+  vector<string> get_configured() const { return configured; }
 };
 
 #endif

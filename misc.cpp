@@ -140,8 +140,8 @@ randomize a number from the index of the vector and select from there */
 bool create_nest(int x, int y, World *w) {
   pair<int, int> coordinates(x, y);
   vector<pair<int, int>> *occupied = w->get_occupied_positions();
-  if ((find(occupied->begin(), occupied->end(), coordinates) != occupied->end()) ==
-      false) {
+  if ((find(occupied->begin(), occupied->end(), coordinates) !=
+       occupied->end()) == false) {
     new Nest(x, y, w);
     cout << "Ninho criado com sucesso" << endl << endl;
     return true;
@@ -159,6 +159,21 @@ bool define_world_size(int size, World *w) {
     cout << "O limite deve ser obrigatoriamente >= 10" << endl;
     return false;
   }
+}
+
+bool configured(World *w) {
+  vector<string> configured = w->get_configured();
+  if (find(configured.begin(), configured.end(), "defmundo") !=
+          configured.end() &&
+      (find(configured.begin(), configured.end(), "defen") !=
+           configured.end() &&
+       (find(configured.begin(), configured.end(), "defpc") !=
+            configured.end() &&
+        find(configured.begin(), configured.end(), "defvt") !=
+            configured.end())))
+    return true;
+  else
+    return false;
 }
 
 void help() {
@@ -191,43 +206,48 @@ void help() {
   cout << endl << "sair -> termina o programa" << endl << endl;
 }
 
-void start(World *w) { handle_command("executa commands.txt", w); }
-
-bool handle_command(string cmd, World *w) {
-
-  vector<string> arg = split_string_into_vector(cmd);
+bool configuration(vector<string> arg, World *w) {
   if (arg[0] == "executa") {
     if (check_args(arg, 2)) {
       read_commands_from_file(arg[1], w);
     }
   } else if (arg[0] == "defmundo") {
     if (check_args(arg, 2)) {
-      define_world_size(stoi(arg[1]), w);
+      if (define_world_size(stoi(arg[1]), w)) {
+        w->set_configured("defmundo");
+      }
     }
   } else if (arg[0] == "defen") {
     if (check_args(arg, 2)) {
-      return define_nests_energy(stoi(arg[1]), w);
+      if (define_nests_energy(stoi(arg[1]), w)) {
+        w->set_configured("defen");
+      }
     }
   } else if (arg[0] == "defpc") {
     if (check_args(arg, 2)) {
-      return define_nests_penergy(stoi(arg[1]), w);
+      if (define_nests_penergy(stoi(arg[1]), w)) {
+        w->set_configured("defpc");
+      }
     }
   } else if (arg[0] == "defvt") {
     if (check_args(arg, 2)) {
-      return define_nests_uenergy(stoi(arg[1]), w);
+      if (define_nests_uenergy(stoi(arg[1]), w)) {
+        w->set_configured("defvt");
+      }
     }
-  } else if (arg[0] == "inicio") {
-    start(w);
-  } else if (arg[0] == "ninho") {
+  } else {
+    return false;
+  }
+  return true;
+}
+
+bool simulation(vector<string> arg, World *w) {
+  if (arg[0] == "ninho") {
     if (check_args(arg, 3)) {
       return create_nest(stoi(arg[1]), stoi(arg[2]), w);
     }
   } else if (arg[0] == "criaf") {
     if (check_args(arg, 4)) {
-      /*arg[1] -> F formigas
-      arg[2] -> T tipo
-      arg[3] -> N Ninho
-      nota: posições aleatorias vazias */
       for (int i = 0; i < stoi(arg[1]); i++) {
         create_ant(w, arg[2].c_str(), stoi(arg[3]));
       }
@@ -244,13 +264,38 @@ bool handle_command(string cmd, World *w) {
   } else if (arg[0] == "listaposicao") {
     if (check_args(arg, 2))
       list_position(stoi(arg[1]), stoi(arg[2]), w);
-  } else if (arg[0] == "sair") {
+  } else {
+    return false;
+  }
+  return true;
+}
+
+void additional_commands(vector<string> arg, World *w) {
+  if (arg[0] == "sair") {
     cout << "Programa terminado!" << endl;
     exit(0);
   } else if (arg[0] == "help") {
     help();
+  } else if (arg[0] == "inicio") {
+    if (configured(w))
+      cout << "Mundo configurado com sucesso" << endl;
+    else
+      cout << "O mundo nao esta totalmente configurado" << endl;
   } else {
-    cout << cmd << " : Comando nao reconhecido" << endl << endl;
+    cout << arg[0] << " : Comando nao reconhecido" << endl;
+  }
+}
+
+bool handle_command(string cmd, World *w) {
+
+  vector<string> arg = split_string_into_vector(cmd);
+
+  if (configured(w) == false) {
+    if (!configuration(arg, w))
+      additional_commands(arg, w);
+  } else {
+    if (!simulation(arg, w))
+      additional_commands(arg, w);
   }
   return true;
 }

@@ -74,3 +74,7 @@ vector<pair<int, int>> *World::get_empty_positions() {
   }
   return empty;
 }
+
+void World::set_configured(string command) {
+  configured.push_back(command);
+}

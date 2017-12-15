@@ -12,7 +12,7 @@ bool check_if_number_is_in_range(int number, unsigned int min,
 bool move_ants(World *w);
 bool read_commands_from_file(string filename, World *w);
 bool handle_command(string cmd, World *w);
-void start(World *w);
+bool start(World *w);
 void help();
 bool define_world_size(int size, World *w);
 bool create_nest(int x, int y, World *w);
