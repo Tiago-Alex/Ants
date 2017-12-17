@@ -11,14 +11,13 @@ class Nest;
 
 class Ant {
   int x, y, energy = 200;
-  const char *type;
   static int sequence;
   const int nserie;
 
   Nest *nest;
 
 public:
-  Ant(int x, int y, const char *type, Nest *n);
+  Ant(int x, int y, Nest *n);
 
   int get_energy() const { return energy; }
 
@@ -33,6 +32,11 @@ public:
   void set_x(int x);
 
   void set_y(int y);
+};
+
+class ExplorerAnt : public Ant {
+public:
+  ExplorerAnt(int x, int y, Nest *n);
 };
 
 #endif

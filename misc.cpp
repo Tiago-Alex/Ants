@@ -127,7 +127,7 @@ randomize a number from the index of the vector and select from there */
 
       vector<pair<int, int>> *empty = w->get_empty_positions();
       pair<int, int> random = empty->at(random_number((int)empty->size()));
-      new Ant(random.first, random.second, type, nest);
+      new ExplorerAnt(random.first, random.second, nest);
       draw(random.first, random.second, "#", w);
       return true;
     } else
