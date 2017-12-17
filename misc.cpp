@@ -1,3 +1,5 @@
+#include "consola.h"
+#include "draw.h"
 #include "main.h"
 #include "misc.h"
 #include "nest.h"
@@ -126,7 +128,7 @@ randomize a number from the index of the vector and select from there */
       vector<pair<int, int>> *empty = w->get_empty_positions();
       pair<int, int> random = empty->at(random_number((int)empty->size()));
       new Ant(random.first, random.second, type, nest);
-      cout << "Formiga criada com sucesso" << endl << endl;
+      draw(random.first, random.second, "#", w);
       return true;
     } else
       cout << "Ninho nao encontrado" << endl;
@@ -142,9 +144,14 @@ bool create_nest(int x, int y, World *w) {
   vector<pair<int, int>> *occupied = w->get_occupied_positions();
   if ((find(occupied->begin(), occupied->end(), coordinates) !=
        occupied->end()) == false) {
-    new Nest(x, y, w);
-    cout << "Ninho criado com sucesso" << endl << endl;
-    return true;
+    if (y <= w->get_world_width() && x <= w->get_world_height()) {
+      new Nest(x, y, w);
+      draw(x, y, "*", w);
+      return true;
+    } else {
+      cout << "Coordenadas invalidas" << endl;
+      return false;
+    }
   } else {
     cout << "Essa posicao ja esta ocupada" << endl;
     return false;
@@ -170,6 +177,8 @@ bool configured(World *w) {
        (find(configured.begin(), configured.end(), "defpc") !=
             configured.end() &&
         find(configured.begin(), configured.end(), "defvt") !=
+            configured.end() &&
+        find(configured.begin(), configured.end(), "inicio") !=
             configured.end())))
     return true;
   else
@@ -207,11 +216,7 @@ void help() {
 }
 
 bool configuration(vector<string> arg, World *w) {
-  if (arg[0] == "executa") {
-    if (check_args(arg, 2)) {
-      read_commands_from_file(arg[1], w);
-    }
-  } else if (arg[0] == "defmundo") {
+  if (arg[0] == "defmundo") {
     if (check_args(arg, 2)) {
       if (define_world_size(stoi(arg[1]), w)) {
         w->set_configured("defmundo");
@@ -235,6 +240,14 @@ bool configuration(vector<string> arg, World *w) {
         w->set_configured("defvt");
       }
     }
+  } else if (arg[0] == "inicio") {
+    w->set_configured("inicio");
+    if (configured(w)) {
+      cout << "Configuracao concluida" << endl;
+      Consola::clrscr();
+      draw_world(w);
+    } else
+      cout << "O mundo nao esta totalmente configurado" << endl;
   } else {
     return false;
   }
@@ -271,16 +284,15 @@ bool simulation(vector<string> arg, World *w) {
 }
 
 void additional_commands(vector<string> arg, World *w) {
-  if (arg[0] == "sair") {
+  if (arg[0] == "executa") {
+    if (check_args(arg, 2)) {
+      read_commands_from_file(arg[1], w);
+    }
+  } else if (arg[0] == "sair") {
     cout << "Programa terminado!" << endl;
     exit(0);
   } else if (arg[0] == "help") {
     help();
-  } else if (arg[0] == "inicio") {
-    if (configured(w))
-      cout << "Mundo configurado com sucesso" << endl;
-    else
-      cout << "O mundo nao esta totalmente configurado" << endl;
   } else {
     cout << arg[0] << " : Comando nao reconhecido" << endl;
   }

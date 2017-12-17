@@ -8,13 +8,15 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
   string cmd;
-  World *world = new World(30, 120);
+  World *world = new World(30, 30);
 
   cout << "Digite [help] para ver a lista de comandos disponiveis" << endl
        << endl;
   while (1) {
     getline(cin, cmd);
-    handle_command(cmd, world);
+    if (cmd != "") {
+      handle_command(cmd, world);
+    }
   }
 
   return 0;
