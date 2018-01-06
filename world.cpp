@@ -19,7 +19,7 @@ void World::set_world_size(int x, int y) {
 
 void World::add_nest(Nest *n) { nests.push_back(n); }
 
-void World::add_crumb(Crumb *c) {crumbs.push_back(c); }
+void World::add_crumb(Crumb *c) { crumbs.push_back(c); }
 
 Nest *World::get_nest_from_id(int id) {
   for (int i = 0; i < (int)nests.size(); i++) {
@@ -45,6 +45,7 @@ Ant *World::get_ant_from_coordinates(int x,int y, World *w) {
 
 const string World::get_elements() {
   //falta adicionar as infos das migalhas
+
   vector<string> nests_list;
   for (int i = 0; i < (int)nests.size(); i++) {
     nests_list.push_back(nests[i]->get_info());
@@ -64,6 +65,8 @@ void World::set_default_penergy(int p) { penergy = p; }
 void World::set_default_uenergy(int u) { uenergy = u; }
 
 void World::set_default_cenergy(int c) { cenergy = c;}
+
+void World::set_default_perc_crumbs(int n) { pcrumbs = (int)n / 100;}
 
 vector<pair<int, int>> *World::get_occupied_positions() {
   vector<pair<int, int>> *occupied = new vector<pair<int, int>>();
@@ -94,13 +97,16 @@ vector<pair<int, int>> *World::get_empty_positions() {
 
 bool World::remove_ant(int x, int y, World *w){
         Ant * ant = get_ant_from_coordinates(x,y,w);
+        draw(ant->get_x(),ant->get_y()," ",w);
         delete ant;
         return true;
   }
 
-bool World::remove_nest(int n){
+bool World::remove_nest(int n, World *w){
       Nest * nest = get_nest_from_id(n);
+      draw(nest->get_x(),nest->get_y()," ",w);
       delete nest;
+      nests.erase(nests.begin() + nest->get_nserie());
       return true;
   }
 

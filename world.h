@@ -16,7 +16,10 @@ class Crumb;
 class Nest;
 
 class World {
-  int width, height, energy = 0, penergy = 0, uenergy = 1, cenergy = 0;
+  int width, height, energy = 0, penergy = 0, uenergy = 1, cenergy = 0, pcrumbs = 0;
+  //penergy = percetagem de energia
+  //uenergy = unidades de energia
+  //pcrumbs = percentagem de migalhas no mundo
 
   vector<Nest *> nests;
   vector<Crumb *> crumbs;
@@ -32,6 +35,8 @@ public:
   int get_world_height() { return height; }
 
   vector<Nest *> get_nests() { return nests; }
+
+  vector<Crumb *> get_crumbs() { return crumbs; }
 
   void add_nest(Nest *n);
 
@@ -51,6 +56,8 @@ public:
 
   int get_default_cenergy() const { return cenergy; }
 
+  int get_perc_of_crumbs() const {return pcrumbs; }
+
   void set_default_energy(int e);
 
   void set_default_penergy(int p);
@@ -58,6 +65,8 @@ public:
   void set_default_uenergy(int u);
 
   void set_default_cenergy(int c);
+
+  void set_default_perc_crumbs(int n);
 
   vector<pair<int, int>> *get_occupied_positions();
 
@@ -69,7 +78,8 @@ public:
 
   bool remove_ant(int x, int y, World *w);
 
-  bool remove_nest(int n);
+  bool remove_nest(int n, World *w);
+
 };
 
 #endif

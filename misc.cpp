@@ -12,8 +12,7 @@
 #include <time.h>
 #include <vector>
 
-bool check_if_number_is_in_range(int number, unsigned int min,
-                                 unsigned int max) {
+bool check_if_number_is_in_range(int number, unsigned int min, unsigned int max) {
   if ((unsigned)(number - min) <= (max - min)) {
     return true;
   } else {
@@ -47,6 +46,16 @@ bool define_nests_uenergy(int uenergy, World *w) {
 bool define_nests_cenergy(int cenergy, World * w) {
   w->set_default_cenergy(cenergy);
   return true;
+}
+
+bool define_perc_of_crumbs(int n, World *w){
+  if(n > 0){
+    w->set_default_perc_crumbs(n);
+    return true;
+  } else{
+      cout << "valor invalido" << endl;
+      return false;
+    }
 }
 
 bool check_args(vector<string> arg, int n) {
@@ -113,7 +122,6 @@ void list_ants(World *w) {
 }
 
 int random_number(int max) {
-
   srand(time(NULL));
 
   return rand() % max + 0;
@@ -147,8 +155,7 @@ randomize a number from the index of the vector and select from there */
 bool create_nest(int x, int y, World *w) {
   pair<int, int> coordinates(x, y);
   vector<pair<int, int>> *occupied = w->get_occupied_positions();
-  if ((find(occupied->begin(), occupied->end(), coordinates) !=
-       occupied->end()) == false) {
+  if ((find(occupied->begin(), occupied->end(), coordinates) != occupied->end()) == false) {
     if (y <= w->get_world_width() && x <= w->get_world_height()) {
       new Nest(x, y, w);
       draw(x, y, "*", w);
@@ -167,7 +174,7 @@ bool create_crumb(int x, int y, World *w){
   pair<int,int> coordinates(x,y);
   vector<pair<int, int>> *occupied = w->get_occupied_positions();
   if ((find(occupied->begin(), occupied->end(), coordinates) != occupied->end()) == false){
-    if (y <= w->get_world_width() && x <= w->get_world_height()){
+    if (y < w->get_world_width() && x < w->get_world_height()) {
       new Crumb(x,y,w);
       draw(x,y,"M",w);
       return true;
@@ -201,6 +208,8 @@ bool configured(World *w) {
             configured.end() &&
         find(configured.begin(), configured.end(), "defvt") !=
             configured.end() &&
+        find(configured.begin(), configured.end(), "defmi") !=
+                configured.end() &&
         find(configured.begin(), configured.end(), "defme") !=
                 configured.end() &&
         find(configured.begin(), configured.end(), "inicio") !=
@@ -263,6 +272,15 @@ bool configuration(vector<string> arg, World *w) {
     if (check_args(arg, 2)) {
       if (define_nests_uenergy(stoi(arg[1]), w)) {
         w->set_configured("defvt");
+      }
+    }
+  } else if (arg[0] == "defmi") {
+    if (check_args(arg, 2)) {
+      if (stoi(arg[1]) < 0)
+        cout << "Valor invalido" << endl;
+      else {
+        define_perc_of_crumbs(stoi(arg[1]),w);
+        w->set_configured("defmi");
       }
     }
   } else if (arg[0] == "defme"){
@@ -329,7 +347,7 @@ bool simulation(vector<string> arg, World *w) {
       }
   } else if (arg[0] == "inseticida"){
     if (check_args(arg, 2)) {
-      if(w->remove_nest(stoi(arg[1])) == true)
+      if(w->remove_nest(stoi(arg[1]),w) == true)
         cout << "Ninho eliminado com sucesso!" << endl;
       else
         cout << "Erro a eliminar ninho" << endl;

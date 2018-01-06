@@ -11,7 +11,7 @@ Crumb::Crumb(int x, int y, World * w):nserie(sequence++){
   this->x = x;
   this->y = y;
   cenergy = w->get_default_cenergy();
-  // world->add_crumb(this);   // Adicionar migalha ao mundo!
+  world->add_crumb(this);   // Adicionar migalha ao mundo!
 }
 
 string Crumb::getInfo() const{

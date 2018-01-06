@@ -27,5 +27,6 @@ bool check_args(vector<string> arg, int n);
 bool define_nests_uenergy(int uenergy, World *w);
 bool define_nests_penergy(int penergy, World *w);
 bool define_nests_energy(int energy, World *w);
+bool define_perc_of_crumbs(int n, World *w);
 
 #endif
