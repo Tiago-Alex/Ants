@@ -28,4 +28,8 @@ void Ant::set_x(int x) { this->x = x; }
 
 void Ant::set_y(int y) { this->y = y; }
 
-ExplorerAnt::ExplorerAnt(int x, int y, Nest *n) : Ant(x, y, n) {}
+void Ant::set_energy(int e) {energy = e; }
+
+ExplorerAnt::ExplorerAnt(int x, int y, Nest *n) : Ant(x, y, n) {
+  set_energy(100);
+}

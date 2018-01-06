@@ -5,7 +5,7 @@
 using namespace std;
 
 COORD GetConsoleCursorPosition() {
-  static const HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+  static const HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE); //vai buscar o conteudo da consola
 
   COORD coord;
 

@@ -2,6 +2,7 @@
 #include "windows.h"
 
 COORD GetConsoleCursorPosition();
+class World;
 
 void draw(int x, int y, const char *c, World *w);
 

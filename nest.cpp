@@ -6,7 +6,7 @@
 
 int Nest::sequence = 0;
 
-Nest::Nest(int x, int y, World *w) : nserie(sequence++) {
+Nest::Nest(int x, int y, World *w) : nserie(sequence++), community(sequence++) {
   this->x = x;
   this->y = y;
   this->world = w;
@@ -36,7 +36,7 @@ void Nest::set_penergy(int p) { penergy = p; }
 
 void Nest::set_uenergy(int u) { uenergy = u; }
 
-void Nest::move_ants_with_range(int range) {
+void Nest::move_ants_with_range(int range, World *w) {
   vector<pair<int, int>> *empty = world->get_empty_positions();
 
   for (int i = 0; i < (int)ants.size(); i++) {
@@ -53,10 +53,12 @@ void Nest::move_ants_with_range(int range) {
       }
     }
     if (empty_in_range.size() > 0) {
-      pair<int, int> random =
-          empty_in_range[random_number((int)empty_in_range.size())];
+      pair<int, int> random = empty_in_range[random_number((int)empty_in_range.size())];
+      ants[i]->set_energy(ants[i]->get_energy() - 1 - (abs(ant_position.first-random.first) + abs(ant_position.second-random.second)));
       ants[i]->set_x(random.first);
       ants[i]->set_y(random.second);
+      draw(ant_position.first,ant_position.second," ",w);
+      draw(random.first,random.second,"#",w);
     }
   }
 }

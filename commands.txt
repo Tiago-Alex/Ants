@@ -1,4 +1,5 @@
 defmundo 20
-defen 100
+defen 200
 defpc 50
 defvt 1
+defme 100

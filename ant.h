@@ -10,7 +10,7 @@ using namespace std;
 class Nest;
 
 class Ant {
-  int x, y, energy = 200;
+  int x, y, energy;
   static int sequence;
   const int nserie;
 
@@ -18,6 +18,8 @@ class Ant {
 
 public:
   Ant(int x, int y, Nest *n);
+
+  // ~Ant() { delete nest; }
 
   int get_energy() const { return energy; }
 
@@ -32,6 +34,8 @@ public:
   void set_x(int x);
 
   void set_y(int y);
+
+  void set_energy(int e);
 };
 
 class ExplorerAnt : public Ant {

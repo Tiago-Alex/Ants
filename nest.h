@@ -2,7 +2,9 @@
 #define NEST_H
 
 #include "ant.h"
+#include "draw.h"
 #include "world.h"
+#include "consola.h"
 #include <string>
 #include <vector>
 
@@ -14,7 +16,7 @@ class World;
 
 class Nest {
   int x, y, energy = 0, penergy = 0, uenergy = 1;
-  const int nserie;
+  const int nserie, community;
   static int sequence;
 
   vector<Ant *> ants;
@@ -48,7 +50,7 @@ public:
 
   vector<Ant *> get_ants() { return ants; }
 
-  void move_ants_with_range(int range);
+  void move_ants_with_range(int range, World *w);
 };
 
 #endif

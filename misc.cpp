@@ -24,7 +24,7 @@ bool check_if_number_is_in_range(int number, unsigned int min,
 bool move_ants(World *w) {
   vector<Nest *> nests = w->get_nests();
   for (int i = 0; i < (int)nests.size(); i++) {
-    nests[i]->move_ants_with_range(8);
+    nests[i]->move_ants_with_range(8,w);
   }
   return true;
 }
@@ -41,6 +41,11 @@ bool define_nests_penergy(int penergy, World *w) {
 
 bool define_nests_uenergy(int uenergy, World *w) {
   w->set_default_uenergy(uenergy);
+  return true;
+}
+
+bool define_nests_cenergy(int cenergy, World * w) {
+  w->set_default_cenergy(cenergy);
   return true;
 }
 
@@ -158,6 +163,24 @@ bool create_nest(int x, int y, World *w) {
   }
 }
 
+bool create_crumb(int x, int y, World *w){
+  pair<int,int> coordinates(x,y);
+  vector<pair<int, int>> *occupied = w->get_occupied_positions();
+  if ((find(occupied->begin(), occupied->end(), coordinates) != occupied->end()) == false){
+    if (y <= w->get_world_width() && x <= w->get_world_height()){
+      new Crumb(x,y,w);
+      draw(x,y,"M",w);
+      return true;
+    } else{
+      cout << "Coordenadas invalidsa!" << endl;
+      return false;
+    }
+  } else {
+    cout << "Essa posicao ja esta ocupada" << endl;
+    return false;
+  }
+}
+
 bool define_world_size(int size, World *w) {
   if (size >= 10) {
     w->set_world_size(size, size);
@@ -178,6 +201,8 @@ bool configured(World *w) {
             configured.end() &&
         find(configured.begin(), configured.end(), "defvt") !=
             configured.end() &&
+        find(configured.begin(), configured.end(), "defme") !=
+                configured.end() &&
         find(configured.begin(), configured.end(), "inicio") !=
             configured.end())))
     return true;
@@ -240,7 +265,14 @@ bool configuration(vector<string> arg, World *w) {
         w->set_configured("defvt");
       }
     }
-  } else if (arg[0] == "inicio") {
+  } else if (arg[0] == "defme"){
+    if (check_args(arg,2)) {
+      if (define_nests_cenergy(stoi(arg[1]),w)) {
+        w->set_configured("defme");
+      }
+    }
+  }
+    else if (arg[0] == "inicio") {
     w->set_configured("inicio");
     if (configured(w)) {
       cout << "Configuracao concluida" << endl;
@@ -265,8 +297,50 @@ bool simulation(vector<string> arg, World *w) {
         create_ant(w, arg[2].c_str(), stoi(arg[3]));
       }
     }
-  } else if (arg[0] == "tempo") {
+  } else if (arg[0] == "migalha"){
+    if (check_args(arg,3)) {
+      return create_crumb(stoi(arg[1]), stoi(arg[2]), w);
+    }
+  } else if (arg[0] == "energninho") {
+    vector<Nest *> nests = w->get_nests();
+    if (check_args(arg,3)) {
+      for(int i = 0; i < (int)nests.size(); i++){
+        if (stoi(arg[1]) == nests[i]->get_nserie())
+          nests[i]->set_energy(nests[i]->get_energy() + stoi(arg[2]));
+      }
+    }
+  } else if (arg[0] == "energformiga") {
+    vector<Nest *> nests = w->get_nests();
+    if (check_args(arg, 4)) {
+      for(int i = 0; i < (int)nests.size(); i++){
+        vector<Ant *> ants = nests[i]->get_ants();
+        for(int j = 0; j < (int)ants.size(); j++){
+          if (stoi(arg[1]) == ants[j]->get_x() && stoi(arg[2]) == ants[j]->get_y())
+            ants[j]->set_energy(ants[j]->get_energy() + stoi(arg[3]));
+          }
+      }
+    }
+  } else if(arg[0] == "mata") {
+    if (check_args(arg, 3)) {
+      if(w->remove_ant(stoi(arg[1]),stoi(arg[2]),w) == true)
+        cout << "Formiga eliminado com sucesso!" << endl;
+      else
+        cout << "Erro a eliminar formiga" << endl;
+      }
+  } else if (arg[0] == "inseticida"){
+    if (check_args(arg, 2)) {
+      if(w->remove_nest(stoi(arg[1])) == true)
+        cout << "Ninho eliminado com sucesso!" << endl;
+      else
+        cout << "Erro a eliminar ninho" << endl;
+      }
+  } else if (arg[0] == "tempo") {  // uma iteração de cada vez
     move_ants(w);
+  } else if(arg[0] == "tempo") {  // várias iterações de uma vez só
+    if (check_args(arg,2)) {
+      for(int i = 0; i < stoi(arg[1]); i++)
+        move_ants(w);
+    }
   } else if (arg[0] == "listamundo") {
     list_world(w);
   } else if (arg[0] == "listaninho") {
@@ -275,9 +349,28 @@ bool simulation(vector<string> arg, World *w) {
   } else if (arg[0] == "listaformigas") {
     list_ants(w);
   } else if (arg[0] == "listaposicao") {
-    if (check_args(arg, 2))
+    if (check_args(arg, 3))
       list_position(stoi(arg[1]), stoi(arg[2]), w);
-  } else {
+  } else if (arg[0] == "apaga") {
+    if (check_args(arg, 2)){
+      if (arg[1] == "commands.txt"){
+         if (remove("commands.txt" ) != 0 )
+          perror( "Error deleting file" );
+        else{
+          puts( "File successfully deleted" );
+          system("cls");
+          main();           // PARA VOLTAR À FASE DE CONFIGURACAO
+        }
+      }
+    }
+  } else if (arg[0] == "guarda"){  // está a guarda em binario
+      if (check_args(arg, 2)){
+        ofstream file;
+        file.open(arg[1]);
+        file.write((char*)(&w), sizeof(World));
+        file.close();
+      }
+  } else {                                          // FALTA GUARDAR E MUDAR UMA CÓPIA DO MUNDO!
     return false;
   }
   return true;
