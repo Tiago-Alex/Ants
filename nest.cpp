@@ -6,7 +6,7 @@
 
 int Nest::sequence = 0;
 
-Nest::Nest(int x, int y, World *w) : nserie(sequence++), community(sequence++) {
+Nest::Nest(int x, int y, World *w) : nserie(sequence++), community(nserie) {
   this->x = x;
   this->y = y;
   this->world = w;
@@ -16,6 +16,16 @@ Nest::Nest(int x, int y, World *w) : nserie(sequence++), community(sequence++) {
 
   /* Add nest to the world on nest creation, so the world store his nests */
   world->add_nest(this);
+}
+
+Nest::~Nest() {
+  vector<Ant *> aux = ants;
+  for (int i = 0; i < (int)aux.size(); i++) {
+    delete aux[i];
+  }
+  ants.clear();
+  world->remove_nest(this);
+  draw(x, y, " ", world);
 }
 
 string Nest::get_info() const {
@@ -53,12 +63,17 @@ void Nest::move_ants_with_range(int range, World *w) {
       }
     }
     if (empty_in_range.size() > 0) {
-      pair<int, int> random = empty_in_range[random_number((int)empty_in_range.size())];
-      ants[i]->set_energy(ants[i]->get_energy() - 1 - (abs(ant_position.first-random.first) + abs(ant_position.second-random.second)));
+      pair<int, int> random =
+          empty_in_range[random_number((int)empty_in_range.size())];
+      ants[i]->set_energy(ants[i]->get_energy() - 1 -
+                          (abs(ant_position.first - random.first) +
+                           abs(ant_position.second - random.second)));
       ants[i]->set_x(random.first);
       ants[i]->set_y(random.second);
-      draw(ant_position.first,ant_position.second," ",w);
-      draw(random.first,random.second,"#",w);
+      draw(ant_position.first, ant_position.second, " ", w);
+      draw(random.first, random.second, "#", w);
     }
   }
 }
+
+void Nest::remove_ant(Ant *a) { ants.erase(ants.begin() + a->get_nserie()); }

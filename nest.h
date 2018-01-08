@@ -2,9 +2,9 @@
 #define NEST_H
 
 #include "ant.h"
+#include "consola.h"
 #include "draw.h"
 #include "world.h"
-#include "consola.h"
 #include <string>
 #include <vector>
 
@@ -25,6 +25,8 @@ class Nest {
 
 public:
   Nest(int x, int y, World *w);
+
+  ~Nest();
 
   int get_x() const { return x; }
 
@@ -51,6 +53,10 @@ public:
   vector<Ant *> get_ants() { return ants; }
 
   void move_ants_with_range(int range, World *w);
+
+  void remove_ant(Ant *a);
+
+  World *get_world() { return world; }
 };
 
 #endif

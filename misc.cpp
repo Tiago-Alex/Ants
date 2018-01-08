@@ -1,3 +1,4 @@
+#include "ant.h"
 #include "consola.h"
 #include "draw.h"
 #include "main.h"
@@ -12,7 +13,20 @@
 #include <time.h>
 #include <vector>
 
-bool check_if_number_is_in_range(int number, unsigned int min, unsigned int max) {
+bool remove_nest(int n, World *w) {
+  Nest *nest = w->get_nest_from_id(n);
+  delete nest;
+  return true;
+}
+
+bool remove_ant(int x, int y, World *w) {
+  Ant *ant = w->get_ant_from_coordinates(x, y);
+  delete ant;
+  return true;
+}
+
+bool check_if_number_is_in_range(int number, unsigned int min,
+                                 unsigned int max) {
   if ((unsigned)(number - min) <= (max - min)) {
     return true;
   } else {
@@ -23,7 +37,7 @@ bool check_if_number_is_in_range(int number, unsigned int min, unsigned int max)
 bool move_ants(World *w) {
   vector<Nest *> nests = w->get_nests();
   for (int i = 0; i < (int)nests.size(); i++) {
-    nests[i]->move_ants_with_range(8,w);
+    nests[i]->move_ants_with_range(8, w);
   }
   return true;
 }
@@ -43,19 +57,19 @@ bool define_nests_uenergy(int uenergy, World *w) {
   return true;
 }
 
-bool define_nests_cenergy(int cenergy, World * w) {
+bool define_nests_cenergy(int cenergy, World *w) {
   w->set_default_cenergy(cenergy);
   return true;
 }
 
-bool define_perc_of_crumbs(int n, World *w){
-  if(n > 0){
+bool define_perc_of_crumbs(int n, World *w) {
+  if (n > 0) {
     w->set_default_perc_crumbs(n);
     return true;
-  } else{
-      cout << "valor invalido" << endl;
-      return false;
-    }
+  } else {
+    cout << "valor invalido" << endl;
+    return false;
+  }
 }
 
 bool check_args(vector<string> arg, int n) {
@@ -128,26 +142,82 @@ int random_number(int max) {
 }
 
 bool create_ant(World *w, const char *type, int n) {
-  if (strcmp(type, "E") == 0) {
-    Nest *nest = w->get_nest_from_id(n);
-    if (nest != NULL) {
 
-      /* How we know empty positions -> we create a vector of pairs(widht,
+  Nest *nest = w->get_nest_from_id(n);
+  if (nest != NULL) {
+
+    /* How we know empty positions -> we create a vector of pairs(widht,
 height) of all occupied positions, we run a cicle of all possible coordinates
 according to the widht*height and we check if the coordinate is occupied, if
 not we add it to a vector of pairs called the empty positions, next we
 randomize a number from the index of the vector and select from there */
 
-      vector<pair<int, int>> *empty = w->get_empty_positions();
-      pair<int, int> random = empty->at(random_number((int)empty->size()));
+    vector<pair<int, int>> *empty = w->get_empty_positions();
+    pair<int, int> random = empty->at(random_number((int)empty->size()));
+    switch (type[0]) {
+    case 'E':
       new ExplorerAnt(random.first, random.second, nest);
       draw(random.first, random.second, "#", w);
+      break;
+    case 'C':
+      new CaregiverAnt(random.first, random.second, nest);
+      draw(random.first, random.second, "&", w);
+      break;
+    case 'V':
+      new VigilantAnt(random.first, random.second, nest);
+      draw(random.first, random.second, "$", w);
+      break;
+    case 'A':
+      new BurglarAnt(random.first, random.second, nest);
+      draw(random.first, random.second, "£", w);
+      break;
+    case 'S':
+      new SurpriseAnt(random.first, random.second, nest);
+      draw(random.first, random.second, "€", w);
+      break;
+    }
+    return true;
+  } else
+    cout << "Ninho nao encontrado" << endl;
+  return false;
+}
+
+bool create_ant_1(World *w, const char *type, int n, int x, int y) {
+  Nest *nest = w->get_nest_from_id(n);
+  pair<int, int> coordinates(x, y);
+  vector<pair<int, int>> *occupied = w->get_occupied_positions();
+  if ((find(occupied->begin(), occupied->end(), coordinates) !=
+       occupied->end()) == false) {
+    if (y < w->get_world_width() && x < w->get_world_height()) {
+      switch (type[0]) {
+      case 'E':
+        new ExplorerAnt(x, y, nest);
+        draw(x, y, "#", w);
+        break;
+      case 'C':
+        new CaregiverAnt(x, y, nest);
+        draw(x, y, "&", w);
+        break;
+      case 'V':
+        new VigilantAnt(x, y, nest);
+        draw(x, y, "$", w);
+        break;
+      case 'A':
+        new BurglarAnt(x, y, nest);
+        draw(x, y, "£", w);
+        break;
+      case 'S':
+        new SurpriseAnt(x, y, nest);
+        draw(x, y, "€", w);
+        break;
+      }
       return true;
-    } else
-      cout << "Ninho nao encontrado" << endl;
-    return false;
+    } else {
+      cout << "Coordenadas invalidas" << endl;
+      return false;
+    }
   } else {
-    cout << "Tipo de formiga invalido" << endl;
+    cout << "Essa posicao ja esta ocupada" << endl;
     return false;
   }
 }
@@ -155,8 +225,9 @@ randomize a number from the index of the vector and select from there */
 bool create_nest(int x, int y, World *w) {
   pair<int, int> coordinates(x, y);
   vector<pair<int, int>> *occupied = w->get_occupied_positions();
-  if ((find(occupied->begin(), occupied->end(), coordinates) != occupied->end()) == false) {
-    if (y <= w->get_world_width() && x <= w->get_world_height()) {
+  if ((find(occupied->begin(), occupied->end(), coordinates) !=
+       occupied->end()) == false) {
+    if (y < w->get_world_width() && x < w->get_world_height()) {
       new Nest(x, y, w);
       draw(x, y, "*", w);
       return true;
@@ -170,15 +241,16 @@ bool create_nest(int x, int y, World *w) {
   }
 }
 
-bool create_crumb(int x, int y, World *w){
-  pair<int,int> coordinates(x,y);
+bool create_crumb(int x, int y, World *w) {
+  pair<int, int> coordinates(x, y);
   vector<pair<int, int>> *occupied = w->get_occupied_positions();
-  if ((find(occupied->begin(), occupied->end(), coordinates) != occupied->end()) == false){
+  if ((find(occupied->begin(), occupied->end(), coordinates) !=
+       occupied->end()) == false) {
     if (y < w->get_world_width() && x < w->get_world_height()) {
-      new Crumb(x,y,w);
-      draw(x,y,"M",w);
+      new Crumb(x, y, w);
+      draw(x, y, "M", w);
       return true;
-    } else{
+    } else {
       cout << "Coordenadas invalidsa!" << endl;
       return false;
     }
@@ -209,9 +281,9 @@ bool configured(World *w) {
         find(configured.begin(), configured.end(), "defvt") !=
             configured.end() &&
         find(configured.begin(), configured.end(), "defmi") !=
-                configured.end() &&
+            configured.end() &&
         find(configured.begin(), configured.end(), "defme") !=
-                configured.end() &&
+            configured.end() &&
         find(configured.begin(), configured.end(), "inicio") !=
             configured.end())))
     return true;
@@ -279,18 +351,17 @@ bool configuration(vector<string> arg, World *w) {
       if (stoi(arg[1]) < 0)
         cout << "Valor invalido" << endl;
       else {
-        define_perc_of_crumbs(stoi(arg[1]),w);
+        define_perc_of_crumbs(stoi(arg[1]), w);
         w->set_configured("defmi");
       }
     }
-  } else if (arg[0] == "defme"){
-    if (check_args(arg,2)) {
-      if (define_nests_cenergy(stoi(arg[1]),w)) {
+  } else if (arg[0] == "defme") {
+    if (check_args(arg, 2)) {
+      if (define_nests_cenergy(stoi(arg[1]), w)) {
         w->set_configured("defme");
       }
     }
-  }
-    else if (arg[0] == "inicio") {
+  } else if (arg[0] == "inicio") {
     w->set_configured("inicio");
     if (configured(w)) {
       cout << "Configuracao concluida" << endl;
@@ -307,7 +378,7 @@ bool configuration(vector<string> arg, World *w) {
 bool simulation(vector<string> arg, World *w) {
   if (arg[0] == "ninho") {
     if (check_args(arg, 3)) {
-      return create_nest(stoi(arg[1]), stoi(arg[2]), w);
+      create_nest(stoi(arg[1]), stoi(arg[2]), w);
     }
   } else if (arg[0] == "criaf") {
     if (check_args(arg, 4)) {
@@ -315,14 +386,18 @@ bool simulation(vector<string> arg, World *w) {
         create_ant(w, arg[2].c_str(), stoi(arg[3]));
       }
     }
-  } else if (arg[0] == "migalha"){
-    if (check_args(arg,3)) {
-      return create_crumb(stoi(arg[1]), stoi(arg[2]), w);
+  } else if (arg[0] == "cria1") {
+    if (check_args(arg, 5)) {
+      create_ant_1(w, arg[1].c_str(), stoi(arg[2]), stoi(arg[3]), stoi(arg[4]));
+    }
+  } else if (arg[0] == "migalha") {
+    if (check_args(arg, 3)) {
+      create_crumb(stoi(arg[1]), stoi(arg[2]), w);
     }
   } else if (arg[0] == "energninho") {
     vector<Nest *> nests = w->get_nests();
-    if (check_args(arg,3)) {
-      for(int i = 0; i < (int)nests.size(); i++){
+    if (check_args(arg, 3)) {
+      for (int i = 0; i < (int)nests.size(); i++) {
         if (stoi(arg[1]) == nests[i]->get_nserie())
           nests[i]->set_energy(nests[i]->get_energy() + stoi(arg[2]));
       }
@@ -330,33 +405,34 @@ bool simulation(vector<string> arg, World *w) {
   } else if (arg[0] == "energformiga") {
     vector<Nest *> nests = w->get_nests();
     if (check_args(arg, 4)) {
-      for(int i = 0; i < (int)nests.size(); i++){
+      for (int i = 0; i < (int)nests.size(); i++) {
         vector<Ant *> ants = nests[i]->get_ants();
-        for(int j = 0; j < (int)ants.size(); j++){
-          if (stoi(arg[1]) == ants[j]->get_x() && stoi(arg[2]) == ants[j]->get_y())
+        for (int j = 0; j < (int)ants.size(); j++) {
+          if (stoi(arg[1]) == ants[j]->get_x() &&
+              stoi(arg[2]) == ants[j]->get_y())
             ants[j]->set_energy(ants[j]->get_energy() + stoi(arg[3]));
-          }
+        }
       }
     }
-  } else if(arg[0] == "mata") {
+  } else if (arg[0] == "mata") {
     if (check_args(arg, 3)) {
-      if(w->remove_ant(stoi(arg[1]),stoi(arg[2]),w) == true)
+      if (remove_ant(stoi(arg[1]), stoi(arg[2]), w) == true)
         cout << "Formiga eliminado com sucesso!" << endl;
       else
         cout << "Erro a eliminar formiga" << endl;
-      }
-  } else if (arg[0] == "inseticida"){
+    }
+  } else if (arg[0] == "inseticida") {
     if (check_args(arg, 2)) {
-      if(w->remove_nest(stoi(arg[1]),w) == true)
+      if (remove_nest(stoi(arg[1]), w) == true)
         cout << "Ninho eliminado com sucesso!" << endl;
       else
         cout << "Erro a eliminar ninho" << endl;
-      }
-  } else if (arg[0] == "tempo") {  // uma iteração de cada vez
+    }
+  } else if (arg[0] == "tempo") { // uma iteração de cada vez
     move_ants(w);
-  } else if(arg[0] == "tempo") {  // várias iterações de uma vez só
-    if (check_args(arg,2)) {
-      for(int i = 0; i < stoi(arg[1]); i++)
+  } else if (arg[0] == "tempo") { // várias iterações de uma vez só
+    if (check_args(arg, 2)) {
+      for (int i = 0; i < stoi(arg[1]); i++)
         move_ants(w);
     }
   } else if (arg[0] == "listamundo") {
@@ -370,25 +446,26 @@ bool simulation(vector<string> arg, World *w) {
     if (check_args(arg, 3))
       list_position(stoi(arg[1]), stoi(arg[2]), w);
   } else if (arg[0] == "apaga") {
-    if (check_args(arg, 2)){
-      if (arg[1] == "commands.txt"){
-         if (remove("commands.txt" ) != 0 )
-          perror( "Error deleting file" );
-        else{
-          puts( "File successfully deleted" );
-          system("cls");
-          main();           // PARA VOLTAR À FASE DE CONFIGURACAO
+    if (check_args(arg, 2)) {
+      if (arg[1] == "commands.txt") {
+        if (remove("commands.txt") != 0)
+          cout << "Erro ao apagar ficheiro" << endl;
+        else {
+          cout << "Ficheiro apagado com sucesso" << endl;
+          w->reset_configuration();
         }
       }
     }
-  } else if (arg[0] == "guarda"){  // está a guarda em binario
-      if (check_args(arg, 2)){
-        ofstream file;
-        file.open(arg[1]);
-        file.write((char*)(&w), sizeof(World));
-        file.close();
-      }
-  } else {                                          // FALTA GUARDAR E MUDAR UMA CÓPIA DO MUNDO!
+  } else if (arg[0] == "guarda") { // está a guarda em binario
+    if (check_args(arg, 2)) {
+      ofstream file;
+      file.open(arg[1]);
+      file.write((char *)(&w), sizeof(World));
+      file.close();
+    }
+  } else if (arg[0] == "muda") { // está a guarda em binario
+    redraw_world(w);
+  } else { // FALTA GUARDAR E MUDAR UMA CÓPIA DO MUNDO!
     return false;
   }
   return true;

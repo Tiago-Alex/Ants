@@ -2,8 +2,8 @@
 #define WORLD_H
 
 #include "ant.h"
-#include "nest.h"
 #include "crumb.h"
+#include "nest.h"
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -16,10 +16,11 @@ class Crumb;
 class Nest;
 
 class World {
-  int width, height, energy = 0, penergy = 0, uenergy = 1, cenergy = 0, pcrumbs = 0;
-  //penergy = percetagem de energia
-  //uenergy = unidades de energia
-  //pcrumbs = percentagem de migalhas no mundo
+  int width, height, energy = 0, penergy = 0, uenergy = 1, cenergy = 0,
+                     pcrumbs = 0;
+  // penergy = percetagem de energia
+  // uenergy = unidades de energia
+  // pcrumbs = percentagem de migalhas no mundo
 
   vector<Nest *> nests;
   vector<Crumb *> crumbs;
@@ -44,7 +45,7 @@ public:
 
   Nest *get_nest_from_id(int id);
 
-  Ant *get_ant_from_coordinates(int x,int y, World *w);
+  Ant *get_ant_from_coordinates(int x, int y);
 
   const string get_elements();
 
@@ -56,7 +57,7 @@ public:
 
   int get_default_cenergy() const { return cenergy; }
 
-  int get_perc_of_crumbs() const {return pcrumbs; }
+  int get_perc_of_crumbs() const { return pcrumbs; }
 
   void set_default_energy(int e);
 
@@ -76,10 +77,9 @@ public:
 
   vector<string> get_configured() const { return configured; }
 
-  bool remove_ant(int x, int y, World *w);
+  void reset_configuration() { configured.clear(); }
 
-  bool remove_nest(int n, World *w);
-
+  void remove_nest(Nest *n);
 };
 
 #endif
