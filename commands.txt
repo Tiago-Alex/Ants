@@ -3,4 +3,4 @@ defen 200
 defpc 50
 defvt 1
 defmi 50
-defme 100
+defme 20

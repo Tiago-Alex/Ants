@@ -19,7 +19,7 @@ class Ant {
 public:
   Ant(int x, int y, Nest *n);
 
-  // ~Ant() { delete nest; }
+  ~Ant();
 
   int get_energy() const { return energy; }
 

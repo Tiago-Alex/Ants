@@ -16,6 +16,11 @@ Ant::Ant(int x, int y, Nest *n) : nserie(sequence++) {
   nest->add_ant(this);
 }
 
+Ant::~Ant() {
+  nest->remove_ant(this);
+  draw(x, y, " ", nest->get_world());
+}
+
 string Ant::get_info() {
   ostringstream os;
   os << "Formiga: " << get_nserie() << endl
@@ -28,7 +33,7 @@ void Ant::set_x(int x) { this->x = x; }
 
 void Ant::set_y(int y) { this->y = y; }
 
-void Ant::set_energy(int e) {energy = e; }
+void Ant::set_energy(int e) { energy = e; }
 
 ExplorerAnt::ExplorerAnt(int x, int y, Nest *n) : Ant(x, y, n) {
   set_energy(100);

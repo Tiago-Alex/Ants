@@ -1,0 +1,12 @@
+TO DO LIST [POO]:
+-> Obtenção de energia por parte da formiga através do ninho (até 50% da energia inicial), por cada iteração recebe 
+    N unidades de energia (valor configurado na fase de configuração), as formigas criadas apartir da linha de comandos
+    não obedecem a esta regra ;
+-> Tranferência de energia da formiga para ao ninho, caso a energia da formiga seja superior à energia inicial (da formiga);
+-> Produção de novas formigas quando o Ninho atinja X% (valor configurada na fase de configuração) a mais do que a sua 
+   energia inicial e não existam formigas a retirar energia nesse instante ;
+-> Determinada percentagem de posições vazias são ocupadas por migalhas (percentagem configurável), onde a cada iteração 
+   surgem entre 0 (valor pode ser aleatatório) a N migalhas no mundo (N é um valor configurável) ;
+-> Obtenção de energia por parte das formigas através das migalhas (a quantidade de energia depende do tipo de formiga) ;
+-> Se a energia da migalha for inferior a 10% da energia inicial desaparece do Mundo ;
+-> Implementação das Regras ;
