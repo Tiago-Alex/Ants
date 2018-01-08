@@ -22,7 +22,7 @@ Crumb::~Crumb() {
 
 void Crumb::set_cenergy(int e) { cenergy = e; }
 
-string Crumb::getInfo() const {
+string Crumb::get_info() const {
   ostringstream os;
   os << "Migalha: " << get_nserie() << endl
      << "Energia: " << getEnergy() << endl

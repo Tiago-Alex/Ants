@@ -18,11 +18,11 @@ class Crumb { // Migalha
 public:
   Crumb(int x, int y, World *w);
   ~Crumb();
-  int getEnergy() const { return cenergy; }
-  int getX() const { return x; }
-  int getY() const { return y; }
+  int get_energy() const { return cenergy; }
+  int get_x() const { return x; }
+  int get_y() const { return y; }
   int get_nserie() const { return nserie; }
   void set_cenergy(int e);
-  string getInfo() const;
+  string get_info() const;
 };
 #endif

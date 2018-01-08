@@ -35,6 +35,8 @@ public:
 
   int get_motion_ray() const { return motion_ray; }
 
+  Nest *get_nest() { return nest; }
+
   void set_x(int x);
 
   void set_y(int y);

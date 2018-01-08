@@ -40,6 +40,8 @@ public:
 
   int get_nserie() const { return nserie; }
 
+  int get_community() const { return community; }
+
   string get_info() const;
 
   void set_energy(int e);
