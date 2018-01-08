@@ -47,6 +47,8 @@ public:
 
   Ant *get_ant_from_coordinates(int x, int y);
 
+  Crumb *get_crumb_by_coordinates(int x, int y);
+
   const string get_elements();
 
   int get_default_energy() const { return energy; }
@@ -80,6 +82,8 @@ public:
   void reset_configuration() { configured.clear(); }
 
   void remove_nest(Nest *n);
+
+  void remove_crumb(Crumb *c);
 };
 
 #endif

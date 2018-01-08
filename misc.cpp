@@ -13,6 +13,39 @@
 #include <time.h>
 #include <vector>
 
+void transfer_energy_ant_to_nest(
+    World *w) { // TRANSFERE ENERGIA DA FORMIGA PARA O NINHO
+  vector<Nest *> nests = w->get_nests();
+  for (int i = 0; i < (int)nests.size(); i++) {
+    vector<Ant *> ants = nests[i]->get_ants();
+    for (int j = 0; j < (int)ants.size(); j++) {
+      if ((ants[i]->get_x() == nests[i]->get_x() &&
+           ants[i]->get_x() == nests[i]->get_x()) &&
+          ants[i]->get_energy() > 200) {
+        ants[i]->set_energy(ants[i]->get_energy() - w->get_default_uenergy());
+        nests[i]->set_energy(nests[i]->get_energy() + w->get_default_uenergy());
+      }
+    }
+  }
+}
+
+void create_ant_by_nest_energy(
+    World *w) { // CRIA FORMIGA DE ACORDO COM A ENERGIA DO NINHO
+  vector<Nest *> nests = w->get_nests();
+  for (int i = 0; i < (int)nests.size(); i++) {
+    if (nests[i]->get_energy() >
+        nests[i]->get_energy() * w->get_default_penergy()) {
+      vector<pair<int, int>> *empty = w->get_empty_positions();
+      pair<int, int> random = empty->at(random_number((int)empty->size()));
+      Ant *a = new ExplorerAnt(nests[i]->get_x(), nests[i]->get_y(),
+                               w->get_nest_from_id(nests[i]->get_nserie()));
+      draw(random.first, random.second, "#", w);
+      a->set_energy(200); //É 200 PORQUE É FORMIGA EXPLORADORA
+      nests[i]->set_energy(nests[i]->get_energy() - a->get_energy());
+    }
+  }
+}
+
 bool remove_nest(int n, World *w) {
   Nest *nest = w->get_nest_from_id(n);
   delete nest;

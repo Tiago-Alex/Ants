@@ -42,9 +42,19 @@ Ant *World::get_ant_from_coordinates(int x, int y) {
   return NULL;
 }
 
-const string World::get_elements() {
-  // falta adicionar as infos das migalhas
+Crumb *World::get_crumb_by_coordinates(int x, int y) {
+  for (int i = 0; i < (int)crumbs.size(); i++) {
+    if (crumbs[i]->getX() == x && crumbs[i]->getY() == y) {
+      return crumbs[i];
+    }
+  }
+  return NULL;
+}
 
+const string World::get_elements() {
+  for (int j = 0; j < (int)crumbs.size(); j++) {
+    cout << crumbs[j]->getInfo();
+  }
   vector<string> nests_list;
   for (int i = 0; i < (int)nests.size(); i++) {
     nests_list.push_back(nests[i]->get_info());
@@ -59,7 +69,7 @@ const string World::get_elements() {
 
 void World::set_default_energy(int e) { energy = e; }
 
-void World::set_default_penergy(int p) { penergy = p; }
+void World::set_default_penergy(int p) { penergy = (p / 100); }
 
 void World::set_default_uenergy(int u) { uenergy = u; }
 
@@ -76,6 +86,8 @@ vector<pair<int, int>> *World::get_occupied_positions() {
       occupied->push_back(make_pair(ants[j]->get_x(), ants[j]->get_y()));
     }
   }
+  for (int k = 0; k < (int)crumbs.size(); k++)
+    occupied->push_back(make_pair(crumbs[k]->getX(), crumbs[k]->getY()));
   return occupied;
 }
 
@@ -98,4 +110,8 @@ void World::set_configured(string command) { configured.push_back(command); }
 
 void World::remove_nest(Nest *n) {
   nests.erase(nests.begin() + n->get_nserie());
+}
+
+void World::remove_crumb(Crumb *c) {
+  crumbs.erase(crumbs.begin() + c->get_nserie());
 }
