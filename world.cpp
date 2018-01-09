@@ -53,7 +53,7 @@ Crumb *World::get_crumb_by_coordinates(int x, int y) {
 
 const string World::get_elements() {
   for (int j = 0; j < (int)crumbs.size(); j++) {
-    cout << crumbs[j]->get_info();
+    cout << "Migalhas : " << crumbs[j]->get_info();
   }
   vector<string> nests_list;
   for (int i = 0; i < (int)nests.size(); i++) {

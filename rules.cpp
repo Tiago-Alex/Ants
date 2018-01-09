@@ -1,166 +1,136 @@
-// #include "ant.h"
-// #include "crumb.h"
-// #include "misc.h"
-// #include "rules.h"
-// #include "world.h"
-// #include <algorithm>
-// #include <iostream>
-//
-// using namespace std;
-//
-// void move_ant(Ant *a, int x, int y) {
-//
-//   a->set_iterations(a->get_iterations() + 1);
-//
-//   int old_x = a->get_x();
-//   int old_y = a->get_y();
-//
-//   World *w = a->get_nest()->get_world();
-//   a->set_x(x);
-//   a->set_y(y);
-//   draw(old_x, old_y, " ", w, 0);
-//
-//   int effective_movement = abs(old_x - x) + abs(old_y - y);
-//
-//   char type = a->get_type();
-//   int color = a->get_nest()->get_community();
-//   switch (type) {
-//   case 'E':
-//     a->set_energy(a->get_energy() - (1 + effective_movement));
-//     if (a->get_energy() <= 0) {
-//       draw(a->get_x(), a->get_y(), " ", w, color);
-//       delete a;
-//     }
-//     if (a->get_energy() > 50)
-//       draw(a->get_x(), a->get_y(), "E", w, color);
-//     else
-//       draw(a->get_x(), a->get_y(), "e", w, color);
-//     break;
-//   case 'C':
-//     if (a->get_energy() <= 0) {
-//       draw(a->get_x(), a->get_y(), " ", w, color);
-//       delete a;
-//     }
-//     if (a->get_x() != a->get_nest()->get_x() &&
-//         a->get_y() != a->get_nest()->get_y())
-//       a->set_energy(a->get_energy() - (1 + effective_movement));
-//     if (a->get_energy() > 50)
-//       draw(a->get_x(), a->get_y(), "C", w, color);
-//     else
-//       draw(a->get_x(), a->get_y(), "c", w, color);
-//     break;
-//   case 'V':
-//     if (a->get_energy() <= 0) {
-//       draw(a->get_x(), a->get_y(), " ", w, color);
-//       delete a;
-//     }
-//     a->set_energy(a->get_energy() - (1 + effective_movement));
-//     if (a->get_energy() > 50)
-//       draw(a->get_x(), a->get_y(), "V", w, color);
-//     else
-//       draw(a->get_x(), a->get_y(), "v", w, color);
-//     break;
-//   case 'A':
-//     if (a->get_energy() <= 0) {
-//       draw(a->get_x(), a->get_y(), " ", w, color);
-//       delete a;
-//     }
-//     a->set_energy(a->get_energy() - (1 + 2 * effective_movement));
-//     if (a->get_energy() > 50)
-//       draw(a->get_x(), a->get_y(), "A", w, color);
-//     else
-//       draw(a->get_x(), a->get_y(), "a", w, color);
-//     break;
-//   case 'S':
-//     if (a->get_energy() <= 0) {
-//       draw(a->get_x(), a->get_y(), " ", w, color);
-//       delete a;
-//     }
-//     a->set_energy(a->get_energy() -
-//                   (effective_movement)); // A cada iteração perde o
-//                                          // movimento efetivo de
-//                                          // unidades de energia
-//     if (a->get_energy() > 50)
-//       draw(a->get_x(), a->get_y(), "S", w, color);
-//     else
-//       draw(a->get_x(), a->get_y(), "s", w, color);
-//     break;
-//   }
-// }
-//
-// void EatCrumbRule(char type, World *w) {
-//   type = tolower(type);
-//   vector<Nest *> nest = w->get_nests();
-//   vector<Crumb *> crumbs = w->get_crumbs();
-//
-//   for (int i = 0; i < (int)nest.size(); i++) {
-//     vector<Ant *> ants = nest[i]->get_ants();
-//     for (int j = 0; j < (int)ants.size(); j++) {
-//       for (int k = 0; k < (int)crumbs.size(); k++) {
-//         int aux =
-//             crumbs[k]->get_energy(); // variavel para saber se a energia da
-//                                      // migalha é superior à próxima migalha
-//         if (ants[j]->get_x() == crumbs[j]->get_x() &&
-//             ants[j]->get_y() == crumbs[j]->get_y() &&
-//             aux > crumbs[k++]->get_energy()) {
-//           switch (type) {
-//           case 'e':
-//             ants[j]->set_energy(ants[j]->get_energy() +
-//                                 0.1 * crumbs[k]->get_energy()); // do tipo
-//                                                                 // exploadora,
-//                                                                 // retira 10% da
-//                                                                 // energia da
-//                                                                 // migalha
-//             crumbs[k]->set_energy(crumbs[k]->get_energy() -
-//                                   ants[j]->get_energy());
-//             break;
-//           case 'c':
-//             ants[j]->set_energy(ants[j]->get_energy() +
-//                                 0.5 * crumbs[k]->get_energy()); // do tipo
-//                                                                 // cuidadora,
-//                                                                 // retira 50% da
-//                                                                 // energia da
-//                                                                 // migalha
-//             crumbs[k]->set_energy(crumbs[k]->get_energy() -
-//                                   ants[j]->get_energy());
-//             break;
-//           case 'v':
-//             ants[j]->set_energy(ants[j]->get_energy() +
-//                                 0.75 *
-//                                     crumbs[k]->get_energy()); // do tipo
-//                                                               // vigilante,
-//                                                               // retira 75% da
-//                                                               // energia da
-//                                                               // migalha
-//             crumbs[k]->set_energy(crumbs[k]->get_energy() -
-//                                   ants[j]->get_energy());
-//
-//             break;
-//           case 'a':
-//             ants[j]->set_energy(ants[j]->get_energy() +
-//                                 0.5 * crumbs[k]->get_energy());
-//             // do tipo
-//             // assaltante,
-//             // retira 25% da
-//             // energia da
-//             // migalha
-//             crumbs[k]->set_energy(crumbs[k]->get_energy() -
-//                                   ants[j]->get_energy());
-//             break;
-//           default:
-//             break;
-//           }
-//           if (crumbs[k]->get_energy() <
-//               0.1 * w->get_default_cenergy()) { // Se tiver menos que 10% da
-//                                                 // energia inicial desaparece
-//             delete crumbs[k];
-//           }
-//         }
-//       }
-//     }
-//   }
-// }
-//
+#include "ant.h"
+#include "crumb.h"
+#include "misc.h"
+#include "rules.h"
+#include "world.h"
+#include <algorithm>
+#include <iostream>
+
+using namespace std;
+
+void move_ant(Ant *a, int x, int y) {
+
+  a->set_iterations(a->get_iterations() + 1);
+
+  int old_x = a->get_x();
+  int old_y = a->get_y();
+
+  a->set_x(x);
+  a->set_y(y);
+
+  int effective_movement = abs(old_x - x) + abs(old_y - y);
+
+  char type = a->get_type();
+
+  switch (type) {
+  case 'E':
+    a->set_energy(a->get_energy() - (1 + effective_movement));
+    if (a->get_energy() <= 0) {
+      delete a;
+    }
+    break;
+  case 'C':
+    if (a->get_x() != a->get_nest()->get_x() &&
+        a->get_y() != a->get_nest()->get_y())
+      a->set_energy(a->get_energy() - (1 + effective_movement));
+    if (a->get_energy() <= 0) {
+      delete a;
+    }
+    break;
+  case 'V':
+    a->set_energy(a->get_energy() - (1 + effective_movement));
+    if (a->get_energy() <= 0) {
+      delete a;
+    }
+    break;
+  case 'A':
+    a->set_energy(a->get_energy() - (1 + 2 * effective_movement));
+    if (a->get_energy() <= 0) {
+      delete a;
+    }
+    break;
+  case 'S':
+    a->set_energy(a->get_energy() - (effective_movement));
+    if (a->get_energy() <= 0) {
+      delete a;
+    }
+    break;
+  }
+}
+
+void EatCrumbRule(char type, World *w) {
+  type = tolower(type);
+  vector<Nest *> nest = w->get_nests();
+  vector<Crumb *> crumbs = w->get_crumbs();
+
+  for (int i = 0; i < (int)nest.size(); i++) {
+    vector<Ant *> ants = nest[i]->get_ants();
+    for (int j = 0; j < (int)ants.size(); j++) {
+      for (int k = 0; k < (int)crumbs.size(); k++) {
+        int aux =
+            crumbs[k]->get_energy(); // variavel para saber se a energia da
+                                     // migalha é superior à próxima migalha
+        if (ants[j]->get_x() == crumbs[j]->get_x() &&
+            ants[j]->get_y() == crumbs[j]->get_y() &&
+            aux > crumbs[k++]->get_energy()) {
+          switch (type) {
+          case 'e':
+            ants[j]->set_energy(ants[j]->get_energy() +
+                                0.1 * crumbs[k]->get_energy()); // do tipo
+                                                                // exploadora,
+                                                                // retira 10% da
+                                                                // energia da
+                                                                // migalha
+            crumbs[k]->set_energy(crumbs[k]->get_energy() -
+                                  ants[j]->get_energy());
+            break;
+          case 'c':
+            ants[j]->set_energy(ants[j]->get_energy() +
+                                0.5 * crumbs[k]->get_energy()); // do tipo
+                                                                // cuidadora,
+                                                                // retira 50% da
+                                                                // energia da
+                                                                // migalha
+            crumbs[k]->set_energy(crumbs[k]->get_energy() -
+                                  ants[j]->get_energy());
+            break;
+          case 'v':
+            ants[j]->set_energy(ants[j]->get_energy() +
+                                0.75 *
+                                    crumbs[k]->get_energy()); // do tipo
+                                                              // vigilante,
+                                                              // retira 75% da
+                                                              // energia da
+                                                              // migalha
+            crumbs[k]->set_energy(crumbs[k]->get_energy() -
+                                  ants[j]->get_energy());
+
+            break;
+          case 'a':
+            ants[j]->set_energy(ants[j]->get_energy() +
+                                0.5 * crumbs[k]->get_energy());
+            // do tipo
+            // assaltante,
+            // retira 25% da
+            // energia da
+            // migalha
+            crumbs[k]->set_energy(crumbs[k]->get_energy() -
+                                  ants[j]->get_energy());
+            break;
+          default:
+            break;
+          }
+          if (crumbs[k]->get_energy() <
+              0.1 * w->get_default_cenergy()) { // Se tiver menos que 10% da
+                                                // energia inicial desaparece
+            delete crumbs[k];
+          }
+        }
+      }
+    }
+  }
+}
+
 // void RunRule(World *w, Ant *a) {
 //   vector<Nest *> nests = w->get_nests();
 //   for (int i = 0; i < (int)nests.size(); i++) {
@@ -169,10 +139,13 @@
 //       if (ants[j]->get_nest()->get_community() ==
 //           a->get_nest()->get_community()) {
 //         int range = a->get_vision_ray();
-//         if ((check_if_number_is_in_range(a->get_x(), (ants[j]->get_x() - range),
+//         if ((check_if_number_is_in_range(a->get_x(), (ants[j]->get_x() -
+//         range),
 //                                          (ants[j]->get_x() + range)) &&
-//              check_if_number_is_in_range(a->get_y(), (ants[j]->get_y() - range),
-//                                          (ants[j]->get_y() + range))) == true) {
+//              check_if_number_is_in_range(a->get_y(), (ants[j]->get_y() -
+//              range),
+//                                          (ants[j]->get_y() + range))) ==
+//                                          true) {
 //           if (a->get_x() ==
 //               ants[i]->get_x()) { // Se tiverem no mesmo eixo dos xx
 //             int x = rand() % a->get_x() -
@@ -198,7 +171,8 @@
 //               a->set_y(y);
 //           } else {
 //             ants[i]->set_x(rand() % ants[i]->get_x() -
-//                            ants[i]->get_motion_ray()); // Se tiver na diagonal
+//                            ants[i]->get_motion_ray()); // Se tiver na
+//                            diagonal
 //             ants[i]->set_y(rand() % ants[i]->get_y() -
 //                            ants[i]->get_motion_ray());
 //           }
@@ -207,8 +181,7 @@
 //     }
 //   }
 // }
-//
-// // Check
+
 // void ChasesRule(World *w, Ant *a) {
 //   int max_energy = 0;
 //   vector<pair<int, int>> *occupied = w->get_occupied_positions();
@@ -220,9 +193,11 @@
 //       if (ants[j]->get_nest()->get_community() !=
 //           a->get_nest()->get_community()) {
 //         int range = a->get_vision_ray();
-//         if (check_if_number_is_in_range(a->get_x(), (ants[j]->get_x() - range),
+//         if (check_if_number_is_in_range(a->get_x(), (ants[j]->get_x() -
+//         range),
 //                                         (ants[j]->get_x() + range)) &&
-//             check_if_number_is_in_range(a->get_y(), (ants[j]->get_y() - range),
+//             check_if_number_is_in_range(a->get_y(), (ants[j]->get_y() -
+//             range),
 //                                         (ants[j]->get_y() + range))) {
 //           if (ants[j]->get_energy() > max_energy) {
 //             max_energy = ants[j]->get_energy();
@@ -232,19 +207,24 @@
 //       }
 //     }
 //   }
-//   if (aux.first == a->get_x()) {             // Se tiverem no mesmo eixo dos xx
-//     int x = rand() % aux.first + a->get_x(); // Valor random entre a coordenada
-//                                              // actual e o seu raio de movimento
+//   if (aux.first == a->get_x()) {             // Se tiverem no mesmo eixo dos
+//   xx
+//     int x = rand() % aux.first + a->get_x(); // Valor random entre a
+//     coordenada
+//                                              // actual e o seu raio de
+//                                              movimento
 //     if (x <= w->get_world_width() &&
 //         (find(occupied->begin(), occupied->end(), x) != occupied->end()) ==
-//             false) // Verificacao se a operacao anterior fica fora da grelha do
+//             false) // Verificacao se a operacao anterior fica fora da grelha
+//             do
 //                    // mundo
 //       a->set_x(0); // se ficar fora a formiga fica com os xx a 0
 //     else
 //       a->set_x(x);
 //   } else if (aux.second == a->get_y()) { // Se tiverem no mesmo eixo dos yy
 //     int x = rand() % aux.second + a->get_y();
-//     if (x <= w->get_world_height() && (find(occupied->begin(), occupied->end(),
+//     if (x <= w->get_world_height() && (find(occupied->begin(),
+//     occupied->end(),
 //                                             x) != occupied->end()) == false)
 //       a->set_y(0);
 //     else
@@ -254,38 +234,38 @@
 //     a->set_y(rand() % aux.second + a->get_y());
 //   }
 // }
-//
-// void RobsRule(World *w, Ant *a) {
-//   int max_energy = 0;
-//   bool touched = false;
-//   Ant *rob;
-//   vector<Nest *> nests = w->get_nests();
-//   for (int i = 0; i < (int)nests.size(); i++) {
-//     vector<Ant *> ants = nests[i]->get_ants();
-//     for (int j = 0; j < (int)ants.size(); j++) {
-//       if (ants[j]->get_nest()->get_community() !=
-//           a->get_nest()->get_community()) {
-//         int range = a->get_motion_ray();
-//         if (check_if_number_is_in_range(a->get_x(), (ants[j]->get_x() - range),
-//                                         (ants[j]->get_x() + range)) &&
-//             check_if_number_is_in_range(a->get_y(), (ants[j]->get_y() - range),
-//                                         (ants[j]->get_y() + range))) {
-//           if (ants[j]->get_energy() > max_energy) {
-//             max_energy = ants[j]->get_energy();
-//             rob = ants[j];
-//             touched = true;
-//           }
-//         }
-//       }
-//     }
-//   }
-//   if (touched) {
-//     int energy = rob->get_energy();
-//     rob->set_energy(energy / 2);
-//     a->set_energy(a->get_energy() + energy / 2);
-//   }
-// }
-//
+
+void RobsRule(World *w, Ant *a) {
+  int max_energy = 0;
+  bool touched = false;
+  Ant *rob;
+  vector<Nest *> nests = w->get_nests();
+  for (int i = 0; i < (int)nests.size(); i++) {
+    vector<Ant *> ants = nests[i]->get_ants();
+    for (int j = 0; j < (int)ants.size(); j++) {
+      if (ants[j]->get_nest()->get_community() !=
+          a->get_nest()->get_community()) {
+        int range = a->get_motion_ray();
+        if (check_if_number_is_in_range(a->get_x(), (ants[j]->get_x() - range),
+                                        (ants[j]->get_x() + range)) &&
+            check_if_number_is_in_range(a->get_y(), (ants[j]->get_y() - range),
+                                        (ants[j]->get_y() + range))) {
+          if (ants[j]->get_energy() > max_energy) {
+            max_energy = ants[j]->get_energy();
+            rob = ants[j];
+            touched = true;
+          }
+        }
+      }
+    }
+  }
+  if (touched) {
+    int energy = rob->get_energy();
+    rob->set_energy(energy / 2);
+    a->set_energy(a->get_energy() + energy / 2);
+  }
+}
+
 // void ProtectRule(World *w, Ant *a) {
 //   pair<int, int> coordinates1;
 //   pair<int, int> coordinates2;
@@ -321,27 +301,32 @@
 //                              // estiverem no eixo dos xx e se a formiga
 //                              // aliada estiver do lado esquerdo à da inimiga
 //         int x = rand() % coordinates2.first +
-//                 coordinates1.first; // valor random do x da formiga aliada ate
+//                 coordinates1.first; // valor random do x da formiga aliada
+//                 ate
 //                                     // ao x da formiga inimiga
-//         if ((find(occupied->begin(), occupied->end(), x) != occupied->end()) ==
+//         if ((find(occupied->begin(), occupied->end(), x) != occupied->end())
+//         ==
 //             false)
 //           a->set_x(x);
 //       } else if (coordinates1.first == coordinates2.first &&
 //                  coordinates1.second > coordinates2.second) {
 //         int x = rand() % coordinates1.first + coordinates2.first;
-//         if ((find(occupied->begin(), occupied->end(), x) != occupied->end()) ==
+//         if ((find(occupied->begin(), occupied->end(), x) != occupied->end())
+//         ==
 //             false)
 //           a->set_y(x);
 //       } else if (coordinates1.second == coordinates2.second &&
 //                  coordinates1.first > coordinates2.first) {
 //         int x = rand() % coordinates2.second + coordinates1.second;
-//         if ((find(occupied->begin(), occupied->end(), x) != occupied->end()) ==
+//         if ((find(occupied->begin(), occupied->end(), x) != occupied->end())
+//         ==
 //             false)
 //           a->set_y(x);
 //       } else if (coordinates1.second == coordinates2.second &&
 //                  coordinates1.first < coordinates2.first) {
 //         int x = rand() % coordinates2.second + coordinates1.second;
-//         if ((find(occupied->begin(), occupied->end(), x) != occupied->end()) ==
+//         if ((find(occupied->begin(), occupied->end(), x) != occupied->end())
+//         ==
 //             false)
 //           a->set_y(x);
 //       } else {
@@ -357,7 +342,7 @@
 //       }
 //     }
 // }
-//
+
 // void SearchCrumbRule(World *w, Ant *a) {
 //   int max_energy = 0;
 //   vector<pair<int, int>> *occupied = w->get_occupied_positions();
@@ -375,7 +360,8 @@
 //                                          ants[j]->get_x() - range) &&
 //              check_if_number_is_in_range(crumbs[k]->get_y(),
 //                                          ants[j]->get_y() + range,
-//                                          ants[j]->get_x() - range)) == true) {
+//                                          ants[j]->get_x() - range)) == true)
+//                                          {
 //
 //           if (crumbs[k]->get_energy() > max_energy) {
 //             max_energy = crumbs[k]->get_energy();
@@ -385,19 +371,24 @@
 //       }
 //     }
 //   }
-//   if (aux.first == a->get_x()) {             // Se tiverem no mesmo eixo dos xx
-//     int x = rand() % aux.first + a->get_x(); // Valor random entre a coordenada
-//                                              // actual e o seu raio de movimento
+//   if (aux.first == a->get_x()) {             // Se tiverem no mesmo eixo dos
+//   xx
+//     int x = rand() % aux.first + a->get_x(); // Valor random entre a
+//     coordenada
+//                                              // actual e o seu raio de
+//                                              movimento
 //     if (x <= w->get_world_width() &&
 //         (find(occupied->begin(), occupied->end(), x) != occupied->end()) ==
-//             false) // Verificacao se a operacao anterior fica fora da grelha do
+//             false) // Verificacao se a operacao anterior fica fora da grelha
+//             do
 //                    // mundo
 //       a->set_x(0); // se ficar fora a formiga fica com os xx a 0
 //     else
 //       a->set_x(x);
 //   } else if (aux.second == a->get_y()) { // Se tiverem no mesmo eixo dos yy
 //     int x = rand() % aux.second + a->get_y();
-//     if (x <= w->get_world_height() && (find(occupied->begin(), occupied->end(),
+//     if (x <= w->get_world_height() && (find(occupied->begin(),
+//     occupied->end(),
 //                                             x) != occupied->end()) == false)
 //       a->set_y(0);
 //     else
@@ -407,8 +398,7 @@
 //     a->set_y(rand() % aux.second + a->get_y());
 //   }
 // }
-//
-// // Check
+
 // void GoToNestRule(World *w, Ant *a) {
 //   int energy = a->get_energy();
 //   int initial_energy = 100;
@@ -441,7 +431,8 @@
 //             if (x <= w->get_world_width() &&
 //                 (find(occupied->begin(), occupied->end(), x) !=
 //                  occupied->end()) == false) // Verificacao se a operacao
-//                                             // anterior fica fora da grelha do
+//                                             // anterior fica fora da grelha
+//                                             do
 //                                             // mundo
 //               a->set_x(0); // se ficar fora a formiga fica com os xx a 0
 //             else
@@ -456,35 +447,35 @@
 //             else
 //               a->set_y(x);
 //           } else {
-//             a->set_x(rand() % aux.first + a->get_x()); // Se tiver na diagonal
-//             a->set_y(rand() % aux.second + a->get_y());
+//             a->set_x(rand() % aux.first + a->get_x()); // Se tiver na
+//             diagonal a->set_y(rand() % aux.second + a->get_y());
 //           }
 //         }
 //       }
 //     }
 //   }
 // }
-//
-// void RideRule(World *w, Ant *a) {
-//   vector<pair<int, int>> *empty = w->get_empty_positions();
-//
-//   int range = a->get_vision_ray();
-//
-//   int x = a->get_x();
-//   int y = a->get_y();
-//
-//   vector<pair<int, int>> empty_in_range;
-//   for (int j = 0; j < (int)empty->size(); j++) {
-//     if (check_if_number_is_in_range(empty->at(j).first, (x - range),
-//                                     (x + range)) &&
-//         check_if_number_is_in_range(empty->at(j).second, (y - range),
-//                                     (y + range))) {
-//       empty_in_range.push_back(empty->at(j));
-//     }
-//   }
-//   if (empty_in_range.size() > 0) {
-//     pair<int, int> random =
-//         empty_in_range[random_number((int)empty_in_range.size())];
-//     move_ant(a, random.first, random.second);
-//   }
-// }
+
+void RideRule(World *w, Ant *a) {
+  vector<pair<int, int>> *empty = w->get_empty_positions();
+
+  int range = a->get_vision_ray();
+
+  int x = a->get_x();
+  int y = a->get_y();
+
+  vector<pair<int, int>> empty_in_range;
+  for (int j = 0; j < (int)empty->size(); j++) {
+    if (check_if_number_is_in_range(empty->at(j).first, (x - range),
+                                    (x + range)) &&
+        check_if_number_is_in_range(empty->at(j).second, (y - range),
+                                    (y + range))) {
+      empty_in_range.push_back(empty->at(j));
+    }
+  }
+  if (empty_in_range.size() > 0) {
+    pair<int, int> random =
+        empty_in_range[random_number((int)empty_in_range.size())];
+    move_ant(a, random.first, random.second);
+  }
+}

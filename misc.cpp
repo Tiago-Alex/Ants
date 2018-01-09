@@ -4,6 +4,7 @@
 #include "main.h"
 #include "misc.h"
 #include "nest.h"
+#include "rules.h"
 #include "string.h"
 #include <algorithm>
 #include <fstream>
@@ -17,6 +18,15 @@ void decrease_crumbs_energy(World *w) {
   vector<Crumb *> crumbs = w->get_crumbs();
   for (int i = 0; i < (int)crumbs.size(); i++) {
     crumbs[i]->set_energy(crumbs[i]->get_energy() - 1);
+  }
+}
+
+void update_crumbs(World *w) {
+  decrease_crumbs_energy(w);
+  vector<Crumb *> crumbs = w->get_crumbs();
+  for (int i = 0; i < (int)crumbs.size(); i++) {
+    if (crumbs[i]->get_energy() <= 0)
+      delete crumbs[i];
   }
 }
 
@@ -42,41 +52,33 @@ void create_ant_by_nest_energy(
   for (int i = 0; i < (int)nests.size(); i++) {
     if (nests[i]->get_energy() >
         nests[i]->get_energy() * w->get_default_penergy()) {
-      vector<pair<int, int>> *empty = w->get_empty_positions();
-      pair<int, int> random = empty->at(random_number((int)empty->size()));
       char type = 'E';
-      int color = nests[i]->get_community() + 1;
       Ant *a = NULL;
       switch (type) {
       case 'E':
         a = new ExplorerAnt(nests[i]->get_x(), nests[i]->get_y(),
                             w->get_nest_from_id(nests[i]->get_nserie()));
         nests[i]->set_energy(nests[i]->get_energy() - a->get_energy());
-        draw(random.first, random.second, "E", w, color);
         break;
       case 'C':
         a = new CaregiverAnt(nests[i]->get_x(), nests[i]->get_y(),
                              w->get_nest_from_id(nests[i]->get_nserie()));
         nests[i]->set_energy(nests[i]->get_energy() - a->get_energy());
-        draw(random.first, random.second, "C", w, color);
         break;
       case 'V':
         a = new VigilantAnt(nests[i]->get_x(), nests[i]->get_y(),
                             w->get_nest_from_id(nests[i]->get_nserie()));
         nests[i]->set_energy(nests[i]->get_energy() - a->get_energy());
-        draw(random.first, random.second, "V", w, color);
         break;
       case 'A':
         a = new BurglarAnt(nests[i]->get_x(), nests[i]->get_y(),
                            w->get_nest_from_id(nests[i]->get_nserie()));
         nests[i]->set_energy(nests[i]->get_energy() - a->get_energy());
-        draw(random.first, random.second, "A", w, color);
         break;
       case 'S':
         a = new SurpriseAnt(nests[i]->get_x(), nests[i]->get_y(),
                             w->get_nest_from_id(nests[i]->get_nserie()));
         nests[i]->set_energy(nests[i]->get_energy() - a->get_energy());
-        draw(random.first, random.second, "S", w, color);
         break;
       }
     }
@@ -104,12 +106,16 @@ bool check_if_number_is_in_range(int number, unsigned int min,
   }
 }
 
-bool move_ants(World *w) {
+void move(World *w) {
   vector<Nest *> nests = w->get_nests();
-  for (int i = 0; i < (int)nests.size(); i++) {
-    nests[i]->move_ants();
-  }
-  return true;
+  if (nests.size() > 0)
+    for (int i = 0; i < (int)nests.size(); i++) {
+      vector<Ant *> ants = nests[i]->get_ants();
+      if (ants.size() > 0)
+        for (int j = 0; j < (int)ants.size(); j++) {
+          RideRule(w, ants[j]);
+        }
+    }
 }
 
 bool define_nests_energy(int energy, World *w) {
@@ -223,27 +229,21 @@ randomize a number from the index of the vector and select from there */
 
     vector<pair<int, int>> *empty = w->get_empty_positions();
     pair<int, int> random = empty->at(random_number((int)empty->size()));
-    int color = nest->get_community() + 1;
     switch (type[0]) {
     case 'E':
       new ExplorerAnt(random.first, random.second, nest);
-      draw(random.first, random.second, "E", w, color);
       break;
     case 'C':
       new CaregiverAnt(random.first, random.second, nest);
-      draw(random.first, random.second, "C", w, color);
       break;
     case 'V':
       new VigilantAnt(random.first, random.second, nest);
-      draw(random.first, random.second, "V", w, color);
       break;
     case 'A':
       new BurglarAnt(random.first, random.second, nest);
-      draw(random.first, random.second, "A", w, color);
       break;
     case 'S':
       new SurpriseAnt(random.first, random.second, nest);
-      draw(random.first, random.second, "S", w, color);
       break;
     }
     return true;
@@ -259,27 +259,21 @@ bool create_ant_1(World *w, const char *type, int n, int x, int y) {
   if ((find(occupied->begin(), occupied->end(), coordinates) !=
        occupied->end()) == false) {
     if (y < w->get_world_width() && x < w->get_world_height()) {
-      int color = nest->get_community() + 1;
       switch (type[0]) {
       case 'E':
         new ExplorerAnt(x, y, nest);
-        draw(x, y, "E", w, color);
         break;
       case 'C':
         new CaregiverAnt(x, y, nest);
-        draw(x, y, "C", w, color);
         break;
       case 'V':
         new VigilantAnt(x, y, nest);
-        draw(x, y, "V", w, color);
         break;
       case 'A':
         new BurglarAnt(x, y, nest);
-        draw(x, y, "A", w, color);
         break;
       case 'S':
         new SurpriseAnt(x, y, nest);
-        draw(x, y, "S", w, color);
         break;
       }
       return true;
@@ -299,8 +293,7 @@ bool create_nest(int x, int y, World *w) {
   if ((find(occupied->begin(), occupied->end(), coordinates) !=
        occupied->end()) == false) {
     if (y < w->get_world_width() && x < w->get_world_height()) {
-      Nest *n = new Nest(x, y, w);
-      draw(x, y, "N", w, n->get_community() + 1);
+      new Nest(x, y, w);
       return true;
     } else {
       cout << "Coordenadas invalidas" << endl;
@@ -319,7 +312,6 @@ bool create_crumb(int x, int y, World *w) {
        occupied->end()) == false) {
     if (y < w->get_world_width() && x < w->get_world_height()) {
       new Crumb(x, y, w);
-      draw(x, y, "M", w, 0);
       return true;
     } else {
       cout << "Coordenadas invalidsa!" << endl;
@@ -452,21 +444,26 @@ bool configuration(vector<string> arg, World *w) {
 bool simulation(vector<string> arg, World *w) {
   if (arg[0] == "ninho") {
     if (check_args(arg, 3)) {
-      create_nest(stoi(arg[1]), stoi(arg[2]), w);
+      if (create_nest(stoi(arg[1]), stoi(arg[2]), w))
+        refresh_world(w);
     }
   } else if (arg[0] == "criaf") {
     if (check_args(arg, 4)) {
       for (int i = 0; i < stoi(arg[1]); i++) {
         create_ant(w, arg[2].c_str(), stoi(arg[3]));
       }
+      refresh_world(w);
     }
   } else if (arg[0] == "cria1") {
     if (check_args(arg, 5)) {
-      create_ant_1(w, arg[1].c_str(), stoi(arg[2]), stoi(arg[3]), stoi(arg[4]));
+      if (create_ant_1(w, arg[1].c_str(), stoi(arg[2]), stoi(arg[3]),
+                       stoi(arg[4])))
+        refresh_world(w);
     }
   } else if (arg[0] == "migalha") {
     if (check_args(arg, 3)) {
-      create_crumb(stoi(arg[1]), stoi(arg[2]), w);
+      if (create_crumb(stoi(arg[1]), stoi(arg[2]), w))
+        refresh_world(w);
     }
   } else if (arg[0] == "energninho") {
     vector<Nest *> nests = w->get_nests();
@@ -490,10 +487,8 @@ bool simulation(vector<string> arg, World *w) {
     }
   } else if (arg[0] == "mata") {
     if (check_args(arg, 3)) {
-      if (remove_ant(stoi(arg[1]), stoi(arg[2]), w) == true)
-        cout << "Formiga eliminado com sucesso!" << endl;
-      else
-        cout << "Erro a eliminar formiga" << endl;
+      if (remove_ant(stoi(arg[1]), stoi(arg[2]), w))
+        refresh_world(w);
     }
   } else if (arg[0] == "inseticida") {
     if (check_args(arg, 2)) {
@@ -503,12 +498,16 @@ bool simulation(vector<string> arg, World *w) {
         cout << "Erro a eliminar ninho" << endl;
     }
   } else if (arg[0] == "tempo") { // uma iteração de cada vez
-    move_ants(w);
-    decrease_crumbs_energy(w);
-  } else if (arg[0] == "tempo") { // várias iterações de uma vez só
     if (check_args(arg, 2)) {
-      for (int i = 0; i < stoi(arg[1]); i++)
-        move_ants(w);
+      for (int i = 0; i < stoi(arg[1]); i++) {
+        move(w);
+        decrease_crumbs_energy(w);
+      }
+      refresh_world(w);
+    } else {
+      move(w);
+      decrease_crumbs_energy(w);
+      refresh_world(w);
     }
   } else if (arg[0] == "listamundo") {
     list_world(w);

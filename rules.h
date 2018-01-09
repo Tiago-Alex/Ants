@@ -1,15 +1,7 @@
-void EatCrumbRule(); // FEITA!
+void move_ant(Ant *a, int x, int y);
 
-void RunRule();
+void EatCrumbRule(char type, World *w);
 
-void SeekRule();
+void RobsRule(World *w, Ant *a);
 
-void RobberyRule();
-
-void ProtectRule();
-
-void SearchCrumbRule();
-
-void gotoNestRule();
-
-void WalkRule();
+void RideRule(World *w, Ant *a);

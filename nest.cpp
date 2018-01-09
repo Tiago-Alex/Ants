@@ -19,13 +19,8 @@ Nest::Nest(int x, int y, World *w) : nserie(sequence++), community(nserie) {
 }
 
 Nest::~Nest() {
-  vector<Ant *> aux = ants;
-  for (int i = 0; i < (int)aux.size(); i++) {
-    delete aux[i];
-  }
   ants.clear();
   world->remove_nest(this);
-  draw(x, y, " ", world, 0);
 }
 
 string Nest::get_info() const {
@@ -45,99 +40,5 @@ void Nest::set_energy(int e) { energy = e; }
 void Nest::set_penergy(int p) { penergy = p; }
 
 void Nest::set_uenergy(int u) { uenergy = u; }
-
-void Nest::move_ants() {
-  vector<pair<int, int>> *empty = world->get_empty_positions();
-
-  for (int i = 0; i < (int)ants.size(); i++) {
-    int range = ants[i]->get_vision_ray();
-    ants[i]->set_iterations(ants[i]->get_iterations() + 1);
-    pair<int, int> ant_position(ants[i]->get_x(), ants[i]->get_y());
-    vector<pair<int, int>> empty_in_range;
-    for (int j = 0; j < (int)empty->size(); j++) {
-      if (check_if_number_is_in_range(empty->at(j).first,
-                                      (ant_position.first - range),
-                                      (ant_position.first + range)) &&
-          check_if_number_is_in_range(empty->at(j).second,
-                                      (ant_position.second - range),
-                                      (ant_position.second + range))) {
-        empty_in_range.push_back(empty->at(j));
-      }
-    }
-    if (empty_in_range.size() > 0) {
-      pair<int, int> random =
-          empty_in_range[random_number((int)empty_in_range.size())];
-      int effective_movement = abs(ant_position.first - random.first) +
-                               abs(ant_position.second - random.second);
-      ants[i]->set_x(random.first);
-      ants[i]->set_y(random.second);
-      draw(ant_position.first, ant_position.second, " ", world, 0);
-      char type = ants[i]->get_type();
-      int color = ants[i]->get_nest()->get_community();
-      switch (type) {
-      case 'E':
-        ants[i]->set_energy(ants[i]->get_energy() - (1 + effective_movement));
-        if (ants[i]->get_energy() <= 0) {
-          draw(ants[i]->get_x(), ants[i]->get_y(), " ", world, color);
-          delete ants[i];
-        }
-        if (ants[i]->get_energy() > 50)
-          draw(ants[i]->get_x(), ants[i]->get_y(), "E", world, color);
-        else
-          draw(ants[i]->get_x(), ants[i]->get_y(), "e", world, color);
-        break;
-      case 'C':
-        if (ants[i]->get_energy() <= 0) {
-          draw(ants[i]->get_x(), ants[i]->get_y(), " ", world, color);
-          delete ants[i];
-        }
-        if (ants[i]->get_x() != x && ants[i]->get_y() != y)
-          ants[i]->set_energy(ants[i]->get_energy() - (1 + effective_movement));
-        if (ants[i]->get_energy() > 50)
-          draw(ants[i]->get_x(), ants[i]->get_y(), "C", world, color);
-        else
-          draw(ants[i]->get_x(), ants[i]->get_y(), "c", world, color);
-        break;
-      case 'V':
-        if (ants[i]->get_energy() <= 0) {
-          draw(ants[i]->get_x(), ants[i]->get_y(), " ", world, color);
-          delete ants[i];
-        }
-        ants[i]->set_energy(ants[i]->get_energy() - (1 + effective_movement));
-        if (ants[i]->get_energy() > 50)
-          draw(ants[i]->get_x(), ants[i]->get_y(), "V", world, color);
-        else
-          draw(ants[i]->get_x(), ants[i]->get_y(), "v", world, color);
-        break;
-      case 'A':
-        if (ants[i]->get_energy() <= 0) {
-          draw(ants[i]->get_x(), ants[i]->get_y(), " ", world, color);
-          delete ants[i];
-        }
-        ants[i]->set_energy(ants[i]->get_energy() -
-                            (1 + 2 * effective_movement));
-        if (ants[i]->get_energy() > 50)
-          draw(ants[i]->get_x(), ants[i]->get_y(), "A", world, color);
-        else
-          draw(ants[i]->get_x(), ants[i]->get_y(), "a", world, color);
-        break;
-      case 'S':
-        if (ants[i]->get_energy() <= 0) {
-          draw(ants[i]->get_x(), ants[i]->get_y(), " ", world, color);
-          delete ants[i];
-        }
-        ants[i]->set_energy(ants[i]->get_energy() -
-                            (effective_movement)); // A cada iteração perde o
-                                                   // movimento efetivo de
-                                                   // unidades de energia
-        if (ants[i]->get_energy() > 50)
-          draw(ants[i]->get_x(), ants[i]->get_y(), "S", world, color);
-        else
-          draw(ants[i]->get_x(), ants[i]->get_y(), "s", world, color);
-        break;
-      }
-    }
-  }
-}
 
 void Nest::remove_ant(Ant *a) { ants.erase(ants.begin() + a->get_nserie()); }

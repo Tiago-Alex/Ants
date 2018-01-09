@@ -17,7 +17,6 @@ Crumb::Crumb(int x, int y, World *w) : nserie(sequence++) {
 
 Crumb::~Crumb() {
   world->remove_crumb(this);
-  draw(x, y, " ", world, 0);
 }
 
 void Crumb::set_energy(int e) { energy = e; }

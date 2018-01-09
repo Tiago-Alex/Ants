@@ -18,7 +18,6 @@ Ant::Ant(int x, int y, Nest *n) : nserie(sequence++) {
 
 Ant::~Ant() {
   nest->remove_ant(this);
-  draw(x, y, " ", nest->get_world(), nest->get_community() + 1);
 }
 
 string Ant::get_info() {
