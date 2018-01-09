@@ -133,13 +133,12 @@ bool define_nests_cenergy(int cenergy, World *w) {
 }
 
 bool define_perc_of_crumbs(int n, World *w) {
-  if (n > 0) {
-    w->set_default_perc_crumbs(n);
-    return true;
-  } else {
-    cout << "valor invalido" << endl;
-    return false;
+  for (int i = 0; i < n; i++) {
+    vector<pair<int, int>> *empty = w->get_empty_positions();
+    pair<int, int> random = empty->at(random_number((int)empty->size()));
+    new Crumb(random.first, random.second, w);
   }
+  return true;
 }
 
 bool check_args(vector<string> arg, int n) {
@@ -423,8 +422,10 @@ bool configuration(vector<string> arg, World *w) {
       if (stoi(arg[1]) < 0)
         cout << "Valor invalido" << endl;
       else {
-        define_perc_of_crumbs(stoi(arg[1]), w);
-        w->set_configured("defmi");
+        if (stoi(arg[1]) > 0) {
+          define_perc_of_crumbs(stoi(arg[1]), w);
+          w->set_configured("defmi");
+        }
       }
     }
   } else if (arg[0] == "defme") {
@@ -439,6 +440,7 @@ bool configuration(vector<string> arg, World *w) {
       cout << "Configuracao concluida" << endl;
       Consola::clrscr();
       draw_world(w);
+      refresh_world(w);
     } else
       cout << "O mundo nao esta totalmente configurado" << endl;
   } else {
@@ -537,7 +539,7 @@ bool simulation(vector<string> arg, World *w) {
       file.close();
     }
   } else if (arg[0] == "muda") {
-    redraw_world(w);
+    refresh_world(w);
   } else { // FALTA GUARDAR E MUDAR UMA CÓPIA DO MUNDO!
     return false;
   }

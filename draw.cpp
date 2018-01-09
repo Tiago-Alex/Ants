@@ -21,10 +21,14 @@ COORD GetConsoleCursorPosition() {
   }
 }
 
-void redraw_world(World *w) {
+void refresh_world(World *w) {
   Consola::clrscr();
   draw_world(w);
   vector<Nest *> nests = w->get_nests();
+  vector<Crumb *> crumbs = w->get_crumbs();
+  for (int i = 0; i < (int)crumbs.size(); i++) {
+    draw(crumbs[i]->get_x(), crumbs[i]->get_y(), "M", w, 0);
+  }
   for (int i = 0; i < (int)nests.size(); i++) {
     int color = nests[i]->get_community() + 1;
     draw(nests[i]->get_x(), nests[i]->get_y(), "N", w, color);
