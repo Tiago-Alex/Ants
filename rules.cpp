@@ -9,6 +9,7 @@ class World;
 class Ant;
 class Crumb;
 
+// Check
 void EatCrumbRule(char type, World *w) {
   type = tolower(type);
   vector<Nest *> nest = w->get_nests();
@@ -32,7 +33,7 @@ void EatCrumbRule(char type, World *w) {
                                                                 // retira 10% da
                                                                 // energia da
                                                                 // migalha
-            crumbs[k]->set_cenergy(crumbs[k]->get_energy() / 0.2);
+            crumbs[k]->set_energy(crumbs[k]->get_energy() / 0.2);
             break;
           case 'c':
             ants[j]->set_energy(ants[j]->get_energy() +
@@ -41,7 +42,7 @@ void EatCrumbRule(char type, World *w) {
                                                                 // retira 50% da
                                                                 // energia da
                                                                 // migalha
-            crumbs[k]->set_cenergy(crumbs[k]->get_energy() / 0.2);
+            crumbs[k]->set_energy(crumbs[k]->get_energy() / 0.2);
             break;
           case 'v':
             ants[j]->set_energy(ants[j]->get_energy() +
@@ -51,7 +52,7 @@ void EatCrumbRule(char type, World *w) {
                                                               // retira 75% da
                                                               // energia da
                                                               // migalha
-            crumbs[k]->set_cenergy(crumbs[k]->get_energy() / 0.2);
+            crumbs[k]->set_energy(crumbs[k]->get_energy() / 0.2);
             break;
           case 'a':
             ants[j]->set_energy(ants[j]->get_energy() +
@@ -60,7 +61,7 @@ void EatCrumbRule(char type, World *w) {
                                                                 // retira 25% da
                                                                 // energia da
                                                                 // migalha
-            crumbs[k]->set_cenergy(crumbs[k]->get_energy() / 0.2);
+            crumbs[k]->set_energy(crumbs[k]->get_energy() / 0.2);
             break;
           default:
             break;
@@ -71,26 +72,42 @@ void EatCrumbRule(char type, World *w) {
   }
 }
 
+// Check
 void RunRule(World *w, Ant *a) {
   vector<Nest *> nests = w->get_nests();
   for (int i = 0; i < (int)nests.size(); i++) {
     vector<Ant *> ants = nests[i]->get_ants();
     for (int j = 0; j < (int)ants.size(); j++) {
-      if (ants[j]->get_nest()->get_community() !=
+      if (ants[j]->get_nest()->get_community() ==
           a->get_nest()->get_community()) {
         int range = a->get_vision_ray();
-        if (check_if_number_is_in_range(a->get_x(), (ants[j]->get_x() - range),
-                                        (ants[j]->get_x() + range)) &&
-            check_if_number_is_in_range(a->get_y(), (ants[j]->get_y() - range),
-                                        (ants[j]->get_y() + range))) {
-          cout << "ok" << endl;
-          //TODO
+        if ((check_if_number_is_in_range(a->get_x(), (ants[j]->get_x() - range),
+                                         (ants[j]->get_x() + range)) &&
+             check_if_number_is_in_range(a->get_y(), (ants[j]->get_y() - range),
+                                         (ants[j]->get_y() + range))) == true) {
+          if (a->get_x() ==
+              ants[i]->get_x()) { // Se tiverem no mesmo eixo dos xx
+            if (a->get_x() > ants[i]->get_x())
+              ants[i]->set_x(ants[i]->get_x() + 1); // Anda uma célula para trás
+            else
+              ants[i]->set_x(ants[i]->get_x() - 1); // Anda uma célula para trás
+          } else if (a->get_y() ==
+                     ants[i]->get_y()) { // Se tiverem no mesmo eixo dos yy
+            if (a->get_y() > ants[i]->get_y())
+              ants[i]->set_y(ants[i]->get_y() + 1); // Anda uma célula para trás
+            else
+              ants[i]->set_y(ants[i]->get_y() - 1); // Anda uma célula para trás
+          } else {
+            ants[i]->set_x(ants[i]->get_x() - 1); // Se tiverem na diagonal
+            ants[i]->set_y(ants[i]->get_y() - 1);
+          }
         }
       }
     }
   }
 }
 
+// Check
 void ChasesRule(World *w, Ant *a) {
   int max_energy = 0;
   pair<int, int> coordinates;
@@ -113,9 +130,18 @@ void ChasesRule(World *w, Ant *a) {
       }
     }
   }
-  //TODO coordinates;
+  if (a->get_x() == coordinates.first) { // Se tiverem no mesmo eixo dos xx
+    a->set_x(coordinates.first - 1);     // Anda uma célula para trás
+  } else if (a->get_y() ==
+             coordinates.second) { // Se tiverem no mesmo eixo dos yy
+    a->set_y(coordinates.second - 1);
+  } else {
+    a->set_x(coordinates.first - 1); // Se tiverem na diagonal
+    a->set_y(coordinates.second - 1);
+  }
 }
 
+// Check
 void RobsRule(World *w, Ant *a) {
   int max_energy = 0;
   bool touched = false;
@@ -172,8 +198,7 @@ void ProtectRule(World *w, Ant *a) {
       }
     }
   }
-  if (same_community)
-    if (another_community)
+  if (same_community && another_community)
       cout << "ok";
   /* TODO : Mover para uma posição intermedia entre as duas*/
 }
@@ -194,5 +219,45 @@ void SearchCrumbRule(World *w, Ant *a) {
       }
     }
   }
-  //TODO:
+  // TODO:
+  delete c;
 }
+
+// Check
+void GoToNestRule(World *w, Ant *a) {
+  int energy = a->get_energy();
+  int initial_energy = 100;
+  Nest *nest = a->get_nest();
+  int range = a->get_vision_ray();
+
+  if (energy > initial_energy || energy < initial_energy / 2) {
+    if (check_if_number_is_in_range(a->get_x(), (nest->get_x() - range),
+                                    (nest->get_x() + range)) &&
+        check_if_number_is_in_range(a->get_y(), (nest->get_y() - range),
+                                    (nest->get_y() + range))) {
+      if (a->get_iterations() > 10) {
+        // Se o ninho estiver no raio de movimento, entra no ninho
+        range = a->get_motion_ray();
+        if (check_if_number_is_in_range(a->get_x(), (nest->get_x() - range),
+                                        (nest->get_x() + range)) &&
+            check_if_number_is_in_range(a->get_y(), (nest->get_y() - range),
+                                        (nest->get_y() + range))) {
+          a->set_x(nest->get_x());
+          a->set_y(nest->get_y());
+        } else {
+          // if (a->get_x() == nest->get_x()) { // Se tiverem no mesmo eixo dos xx
+          //   a->set_x(nest->get_x() - 1);     // Anda uma célula para trás
+          // } else if (a->get_y() ==
+          //            nest->get_y()) { // Se tiverem no mesmo eixo dos yy
+          //   a->set_y(nest->get_y() - 1);
+          // } else {
+          //   a->set_x(nest->get_x() - 1); // Se tiverem na diagonal
+          //   a->set_y(nest->get_y() - 1);
+          // }
+        }
+      }
+    }
+  }
+}
+
+void RideRule() {}

@@ -1,4 +1,5 @@
 #include "ant.h"
+#include "consola.h"
 #include "misc.h"
 #include "world.h"
 #include <iostream>
@@ -9,6 +10,8 @@ using namespace std;
 int main() {
   string cmd;
   World *world = new World(30, 30);
+
+  Consola::clrscr();
 
   cout << "Digite [help] para ver a lista de comandos disponiveis" << endl
        << endl;

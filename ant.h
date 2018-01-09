@@ -10,9 +10,10 @@ using namespace std;
 class Nest;
 
 class Ant {
-  int x, y, energy, vision_ray, motion_ray;
+  int x, y, energy, vision_ray, motion_ray, iterations;
   static int sequence;
   const int nserie;
+  char type;
 
   Nest *nest;
 
@@ -37,6 +38,10 @@ public:
 
   Nest *get_nest() { return nest; }
 
+  int get_iterations() { return iterations; }
+
+  char get_type() const { return type; }
+
   void set_x(int x);
 
   void set_y(int y);
@@ -46,6 +51,10 @@ public:
   void set_vision_ray(int v);
 
   void set_motion_ray(int m);
+
+  void set_iterations(int i);
+
+  void set_type(char t);
 };
 
 class ExplorerAnt : public Ant {

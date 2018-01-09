@@ -44,7 +44,7 @@ Ant *World::get_ant_from_coordinates(int x, int y) {
 
 Crumb *World::get_crumb_by_coordinates(int x, int y) {
   for (int i = 0; i < (int)crumbs.size(); i++) {
-    if (crumbs[i]->getX() == x && crumbs[i]->getY() == y) {
+    if (crumbs[i]->get_x() == x && crumbs[i]->get_y() == y) {
       return crumbs[i];
     }
   }
@@ -53,7 +53,7 @@ Crumb *World::get_crumb_by_coordinates(int x, int y) {
 
 const string World::get_elements() {
   for (int j = 0; j < (int)crumbs.size(); j++) {
-    cout << crumbs[j]->getInfo();
+    cout << crumbs[j]->get_info();
   }
   vector<string> nests_list;
   for (int i = 0; i < (int)nests.size(); i++) {
@@ -87,7 +87,7 @@ vector<pair<int, int>> *World::get_occupied_positions() {
     }
   }
   for (int k = 0; k < (int)crumbs.size(); k++)
-    occupied->push_back(make_pair(crumbs[k]->getX(), crumbs[k]->getY()));
+    occupied->push_back(make_pair(crumbs[k]->get_x(), crumbs[k]->get_y()));
   return occupied;
 }
 

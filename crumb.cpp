@@ -11,21 +11,21 @@ Crumb::Crumb(int x, int y, World *w) : nserie(sequence++) {
   this->x = x;
   this->y = y;
   this->world = w;
-  cenergy = w->get_default_cenergy();
+  energy = w->get_default_energy();
   world->add_crumb(this); // Adicionar migalha ao mundo!
 }
 
 Crumb::~Crumb() {
   world->remove_crumb(this);
-  draw(x, y, " ", world);
+  draw(x, y, " ", world, 0);
 }
 
-void Crumb::set_cenergy(int e) { cenergy = e; }
+void Crumb::set_energy(int e) { energy = e; }
 
 string Crumb::get_info() const {
   ostringstream os;
   os << "Migalha: " << get_nserie() << endl
-     << "Energia: " << getEnergy() << endl
-     << "Posicao: (" << getX() << "," << getY() << ")" << endl;
+     << "Energia: " << get_energy() << endl
+     << "Posicao: (" << get_x() << "," << get_y() << ")" << endl;
   return os.str();
 }

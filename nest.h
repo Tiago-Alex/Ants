@@ -54,7 +54,7 @@ public:
 
   vector<Ant *> get_ants() { return ants; }
 
-  void move_ants_with_range(int range, World *w);
+  void move_ants();
 
   void remove_ant(Ant *a);
 
