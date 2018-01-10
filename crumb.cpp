@@ -15,16 +15,14 @@ Crumb::Crumb(int x, int y, World *w) : nserie(sequence++) {
   world->add_crumb(this); // Adicionar migalha ao mundo!
 }
 
-Crumb::~Crumb() {
-  world->remove_crumb(this);
-}
+Crumb::~Crumb() {}
 
 void Crumb::set_energy(int e) { energy = e; }
 
 string Crumb::get_info() const {
   ostringstream os;
   os << "Migalha: " << get_nserie() << endl
-     << "Energia: " << get_energy() << endl
-     << "Posicao: (" << get_x() << "," << get_y() << ")" << endl;
+     << "\tEnergia: " << get_energy() << endl
+     << "\tPosicao: (" << get_x() << "," << get_y() << ")" << endl;
   return os.str();
 }

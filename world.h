@@ -17,7 +17,7 @@ class Nest;
 
 class World {
   int width, height, energy = 0, penergy = 0, uenergy = 1, cenergy = 0,
-                     pcrumbs = 0;
+                     pcrumbs = 0, max_crumbs = 0;
   // penergy = percetagem de energia
   // uenergy = unidades de energia
   // pcrumbs = percentagem de migalhas no mundo
@@ -61,6 +61,8 @@ public:
 
   int get_perc_of_crumbs() const { return pcrumbs; }
 
+  int get_max_crumbs() const { return max_crumbs; }
+
   void set_default_energy(int e);
 
   void set_default_penergy(int p);
@@ -81,9 +83,11 @@ public:
 
   void reset_configuration() { configured.clear(); }
 
-  void remove_nest(Nest *n);
+  bool remove_nest(int n);
 
-  void remove_crumb(Crumb *c);
+  bool remove_crumb(int c);
+
+  void set_max_crumbs(int c);
 };
 
 #endif

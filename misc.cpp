@@ -16,7 +16,7 @@
 
 void decrease_crumbs_energy(World *w) {
   vector<Crumb *> crumbs = w->get_crumbs();
-  for (int i = 0; i < (int)crumbs.size(); i++) {
+  for (int i = 0; i < (int)crumbs.size(); ++i) {
     crumbs[i]->set_energy(crumbs[i]->get_energy() - 1);
   }
 }
@@ -24,18 +24,19 @@ void decrease_crumbs_energy(World *w) {
 void update_crumbs(World *w) {
   decrease_crumbs_energy(w);
   vector<Crumb *> crumbs = w->get_crumbs();
-  for (int i = 0; i < (int)crumbs.size(); i++) {
-    if (crumbs[i]->get_energy() <= 0)
-      delete crumbs[i];
+  for (int i = 0; i < (int)crumbs.size(); ++i) {
+    if (crumbs[i]->get_energy() < w->get_default_cenergy() * 0.1) {
+      w->remove_crumb(crumbs[i]->get_nserie());
+    }
   }
 }
 
 void transfer_energy_ant_to_nest(
     World *w) { // TRANSFERE ENERGIA DA FORMIGA PARA O NINHO
   vector<Nest *> nests = w->get_nests();
-  for (int i = 0; i < (int)nests.size(); i++) {
+  for (int i = 0; i < (int)nests.size(); ++i) {
     vector<Ant *> ants = nests[i]->get_ants();
-    for (int j = 0; j < (int)ants.size(); j++) {
+    for (int j = 0; j < (int)ants.size(); ++j) {
       if ((ants[i]->get_x() == nests[i]->get_x() &&
            ants[i]->get_x() == nests[i]->get_x()) &&
           ants[i]->get_energy() > 200) {
@@ -49,7 +50,7 @@ void transfer_energy_ant_to_nest(
 void create_ant_by_nest_energy(
     World *w) { // CRIA FORMIGA DE ACORDO COM A ENERGIA DO NINHO
   vector<Nest *> nests = w->get_nests();
-  for (int i = 0; i < (int)nests.size(); i++) {
+  for (int i = 0; i < (int)nests.size(); ++i) {
     if (nests[i]->get_energy() >
         nests[i]->get_energy() * w->get_default_penergy()) {
       char type = 'E';
@@ -85,16 +86,18 @@ void create_ant_by_nest_energy(
   }
 }
 
-bool remove_nest(int n, World *w) {
-  Nest *nest = w->get_nest_from_id(n);
-  delete nest;
-  return true;
-}
-
 bool remove_ant(int x, int y, World *w) {
-  Ant *ant = w->get_ant_from_coordinates(x, y);
-  delete ant;
-  return true;
+  vector<Nest *> nests = w->get_nests();
+  for (int j = 0; j < (int)nests.size(); ++j) {
+    vector<Ant *> ants = nests[j]->get_ants();
+    for (int i = 0; i < (int)ants.size(); ++i) {
+      if (ants[i]->get_x() == x && ants[i]->get_y() == y) {
+        nests[i]->remove_ant(ants[i]->get_nserie());
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 bool check_if_number_is_in_range(int number, unsigned int min,
@@ -106,14 +109,20 @@ bool check_if_number_is_in_range(int number, unsigned int min,
   }
 }
 
-void move(World *w) {
+void iteration(World *w) {
+  // adicionar n migalhas ao ninho
+  define_perc_of_crumbs(random_number(w->get_max_crumbs()), w);
+
   vector<Nest *> nests = w->get_nests();
   if (nests.size() > 0)
-    for (int i = 0; i < (int)nests.size(); i++) {
+    for (int i = 0; i < (int)nests.size(); ++i) {
       vector<Ant *> ants = nests[i]->get_ants();
       if (ants.size() > 0)
-        for (int j = 0; j < (int)ants.size(); j++) {
+        for (int j = 0; j < (int)ants.size(); ++j) {
           RideRule(w, ants[j]);
+          if (ants[j]->get_energy() <= 0) {
+            nests[i]->remove_ant(ants[j]->get_nserie());
+          }
         }
     }
 }
@@ -138,10 +147,16 @@ bool define_nests_cenergy(int cenergy, World *w) {
   return true;
 }
 
+bool define_max_crumbs_per_iteration(int c, World *w) {
+  w->set_max_crumbs(c);
+  return true;
+}
+
 bool define_perc_of_crumbs(int n, World *w) {
-  for (int i = 0; i < n; i++) {
-    vector<pair<int, int>> *empty = w->get_empty_positions();
+  vector<pair<int, int>> *empty = w->get_empty_positions();
+  for (int i = 0; i < n; ++i) {
     pair<int, int> random = empty->at(random_number((int)empty->size()));
+    empty->push_back(random);
     new Crumb(random.first, random.second, w);
   }
   return true;
@@ -169,12 +184,12 @@ bool list_nest(World *w, int key) {
 bool list_position(int x, int y, World *w) {
   vector<Nest *> nests = w->get_nests();
   if (nests.size() > 0) {
-    for (int i = 0; i < (int)nests.size(); i++) {
+    for (int i = 0; i < (int)nests.size(); ++i) {
       if (nests[i]->get_x() == x && nests[i]->get_y() == y) {
         cout << nests[i]->get_info() << endl;
       }
       vector<Ant *> ants = nests[i]->get_ants();
-      for (int j = 0; j < (int)ants.size(); j++) {
+      for (int j = 0; j < (int)ants.size(); ++j) {
         if (ants[j]->get_x() == x && ants[j]->get_y() == y) {
           cout << ants[j]->get_info() << endl;
         }
@@ -202,9 +217,9 @@ vector<string> split_string_into_vector(string str) {
 
 void list_ants(World *w) {
   vector<Nest *> nests = w->get_nests();
-  for (int i = 0; i < (int)nests.size(); i++) {
+  for (int i = 0; i < (int)nests.size(); ++i) {
     vector<Ant *> ants = nests[i]->get_ants();
-    for (int j = 0; j < (int)ants.size(); j++) {
+    for (int j = 0; j < (int)ants.size(); ++j) {
       cout << ants[j]->get_info() << endl;
     }
   }
@@ -290,6 +305,13 @@ bool create_ant_1(World *w, const char *type, int n, int x, int y) {
 bool create_nest(int x, int y, World *w) {
   pair<int, int> coordinates(x, y);
   vector<pair<int, int>> *occupied = w->get_occupied_positions();
+  // Adicionar as migalhas aos ocupados, pois os ninhos nao podem havitar no seu
+  // sitio
+  vector<Crumb *> crumbs = w->get_crumbs();
+  for (int i = 0; i < (int)crumbs.size(); ++i) {
+    pair<int, int> occ(crumbs[i]->get_x(), crumbs[i]->get_y());
+    occupied->push_back(occ);
+  }
   if ((find(occupied->begin(), occupied->end(), coordinates) !=
        occupied->end()) == false) {
     if (y < w->get_world_width() && x < w->get_world_height()) {
@@ -308,13 +330,20 @@ bool create_nest(int x, int y, World *w) {
 bool create_crumb(int x, int y, World *w) {
   pair<int, int> coordinates(x, y);
   vector<pair<int, int>> *occupied = w->get_occupied_positions();
+  // Adicionar as migalhas aos ocupados, pois as migalhas devem sobrepor-se umas
+  // às outras
+  vector<Crumb *> crumbs = w->get_crumbs();
+  for (int i = 0; i < (int)crumbs.size(); ++i) {
+    pair<int, int> occ(crumbs[i]->get_x(), crumbs[i]->get_y());
+    occupied->push_back(occ);
+  }
   if ((find(occupied->begin(), occupied->end(), coordinates) !=
        occupied->end()) == false) {
     if (y < w->get_world_width() && x < w->get_world_height()) {
       new Crumb(x, y, w);
       return true;
     } else {
-      cout << "Coordenadas invalidsa!" << endl;
+      cout << "Coordenadas invalidas!" << endl;
       return false;
     }
   } else {
@@ -346,6 +375,8 @@ bool configured(World *w) {
         find(configured.begin(), configured.end(), "defmi") !=
             configured.end() &&
         find(configured.begin(), configured.end(), "defme") !=
+            configured.end() &&
+        find(configured.begin(), configured.end(), "defnm") !=
             configured.end() &&
         find(configured.begin(), configured.end(), "inicio") !=
             configured.end())))
@@ -426,6 +457,12 @@ bool configuration(vector<string> arg, World *w) {
         w->set_configured("defme");
       }
     }
+  } else if (arg[0] == "defnm") {
+    if (check_args(arg, 2)) {
+      if (define_max_crumbs_per_iteration(stoi(arg[1]), w)) {
+        w->set_configured("defnm");
+      }
+    }
   } else if (arg[0] == "inicio") {
     w->set_configured("inicio");
     if (configured(w)) {
@@ -449,7 +486,7 @@ bool simulation(vector<string> arg, World *w) {
     }
   } else if (arg[0] == "criaf") {
     if (check_args(arg, 4)) {
-      for (int i = 0; i < stoi(arg[1]); i++) {
+      for (int i = 0; i < stoi(arg[1]); ++i) {
         create_ant(w, arg[2].c_str(), stoi(arg[3]));
       }
       refresh_world(w);
@@ -468,7 +505,7 @@ bool simulation(vector<string> arg, World *w) {
   } else if (arg[0] == "energninho") {
     vector<Nest *> nests = w->get_nests();
     if (check_args(arg, 3)) {
-      for (int i = 0; i < (int)nests.size(); i++) {
+      for (int i = 0; i < (int)nests.size(); ++i) {
         if (stoi(arg[1]) == nests[i]->get_nserie())
           nests[i]->set_energy(nests[i]->get_energy() + stoi(arg[2]));
       }
@@ -476,9 +513,9 @@ bool simulation(vector<string> arg, World *w) {
   } else if (arg[0] == "energformiga") {
     vector<Nest *> nests = w->get_nests();
     if (check_args(arg, 4)) {
-      for (int i = 0; i < (int)nests.size(); i++) {
+      for (int i = 0; i < (int)nests.size(); ++i) {
         vector<Ant *> ants = nests[i]->get_ants();
-        for (int j = 0; j < (int)ants.size(); j++) {
+        for (int j = 0; j < (int)ants.size(); ++j) {
           if (stoi(arg[1]) == ants[j]->get_x() &&
               stoi(arg[2]) == ants[j]->get_y())
             ants[j]->set_energy(ants[j]->get_energy() + stoi(arg[3]));
@@ -489,23 +526,27 @@ bool simulation(vector<string> arg, World *w) {
     if (check_args(arg, 3)) {
       if (remove_ant(stoi(arg[1]), stoi(arg[2]), w))
         refresh_world(w);
+      else
+        cout << "Erro ao eliminar formiga" << endl;
     }
   } else if (arg[0] == "inseticida") {
     if (check_args(arg, 2)) {
-      if (remove_nest(stoi(arg[1]), w) == true)
+      if (w->remove_nest(stoi(arg[1])) == true) {
         cout << "Ninho eliminado com sucesso!" << endl;
-      else
+        refresh_world(w);
+      } else {
         cout << "Erro a eliminar ninho" << endl;
+      }
     }
   } else if (arg[0] == "tempo") { // uma iteração de cada vez
     if (check_args(arg, 2)) {
-      for (int i = 0; i < stoi(arg[1]); i++) {
-        move(w);
+      for (int i = 0; i < stoi(arg[1]); ++i) {
+        iteration(w);
         decrease_crumbs_energy(w);
       }
       refresh_world(w);
     } else {
-      move(w);
+      iteration(w);
       decrease_crumbs_energy(w);
       refresh_world(w);
     }

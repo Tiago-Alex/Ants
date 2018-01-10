@@ -18,10 +18,7 @@ Nest::Nest(int x, int y, World *w) : nserie(sequence++), community(nserie) {
   world->add_nest(this);
 }
 
-Nest::~Nest() {
-  ants.clear();
-  world->remove_nest(this);
-}
+Nest::~Nest() {}
 
 string Nest::get_info() const {
 
@@ -41,4 +38,13 @@ void Nest::set_penergy(int p) { penergy = p; }
 
 void Nest::set_uenergy(int u) { uenergy = u; }
 
-void Nest::remove_ant(Ant *a) { ants.erase(ants.begin() + a->get_nserie()); }
+bool Nest::remove_ant(int a) {
+  for (int i = 0; i < (int)ants.size(); i++) {
+    if (ants[i]->get_nserie() == a) {
+      delete ants[i];
+      ants.erase(ants.begin() + i);
+      return true;
+    }
+  }
+  return false;
+}

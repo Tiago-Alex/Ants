@@ -89,12 +89,45 @@ void draw_world(World *w) {
     cout << "-";
     Consola::gotoxy(i, y + 1);
     cout << "-";
+
+    Consola::gotoxy(i, y + 2);
+    if (i % 2 == 0)
+      Consola::setBackgroundColor(7);
+    else
+      Consola::setBackgroundColor(8);
+    Consola::setTextColor(0);
+    char numero[2];
+    sprintf(numero, "%d", i - 1);
+    if (i - 1 >= 10) {
+      cout << numero[0];
+      Consola::gotoxy(i, y + 3);
+      cout << numero[1];
+      Consola::gotoxy(i, y + 2);
+    } else {
+      cout << numero[0];
+      Consola::gotoxy(i, y + 3);
+      cout << " ";
+      Consola::gotoxy(i, y + 2);
+    }
+    Consola::setBackgroundColor(0);
+    Consola::setTextColor(7);
   }
   for (int i = 1; i < y + 1; i++) {
     Consola::gotoxy(0, i);
     cout << "|";
     Consola::gotoxy(x + 1, i);
-    cout << "| " << i - 1;
+    cout << "|";
+    if (i % 2 == 0)
+      Consola::setBackgroundColor(7);
+    else
+      Consola::setBackgroundColor(8);
+    Consola::setTextColor(0);
+    if (i - 1 >= 10)
+      cout << i - 1;
+    else
+      cout << i - 1 << " ";
+    Consola::setBackgroundColor(0);
+    Consola::setTextColor(7);
   }
-  Consola::gotoxy(0, y + 4);
+  Consola::gotoxy(0, y + 5);
 }

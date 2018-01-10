@@ -22,7 +22,7 @@ void World::add_nest(Nest *n) { nests.push_back(n); }
 void World::add_crumb(Crumb *c) { crumbs.push_back(c); }
 
 Nest *World::get_nest_from_id(int id) {
-  for (int i = 0; i < (int)nests.size(); i++) {
+  for (int i = 0; i < (int)nests.size(); ++i) {
     if (nests[i]->get_nserie() == id) {
       return nests[i];
     }
@@ -31,9 +31,9 @@ Nest *World::get_nest_from_id(int id) {
 }
 
 Ant *World::get_ant_from_coordinates(int x, int y) {
-  for (int j = 0; j < (int)nests.size(); j++) {
+  for (int j = 0; j < (int)nests.size(); ++j) {
     vector<Ant *> ants = nests[j]->get_ants();
-    for (int i = 0; i < (int)ants.size(); i++) {
+    for (int i = 0; i < (int)ants.size(); ++i) {
       if (ants[i]->get_x() == x && ants[i]->get_y() == y) {
         return ants[i];
       }
@@ -43,7 +43,7 @@ Ant *World::get_ant_from_coordinates(int x, int y) {
 }
 
 Crumb *World::get_crumb_by_coordinates(int x, int y) {
-  for (int i = 0; i < (int)crumbs.size(); i++) {
+  for (int i = 0; i < (int)crumbs.size(); ++i) {
     if (crumbs[i]->get_x() == x && crumbs[i]->get_y() == y) {
       return crumbs[i];
     }
@@ -52,11 +52,11 @@ Crumb *World::get_crumb_by_coordinates(int x, int y) {
 }
 
 const string World::get_elements() {
-  for (int j = 0; j < (int)crumbs.size(); j++) {
+  for (int j = 0; j < (int)crumbs.size(); ++j) {
     cout << "Migalhas : " << crumbs[j]->get_info();
   }
   vector<string> nests_list;
-  for (int i = 0; i < (int)nests.size(); i++) {
+  for (int i = 0; i < (int)nests.size(); ++i) {
     nests_list.push_back(nests[i]->get_info());
   }
   ostringstream ss;
@@ -77,17 +77,17 @@ void World::set_default_cenergy(int c) { cenergy = c; }
 
 void World::set_default_perc_crumbs(int n) { pcrumbs = (int)n / 100; }
 
+void World::set_max_crumbs(int c) { max_crumbs = c; }
+
 vector<pair<int, int>> *World::get_occupied_positions() {
   vector<pair<int, int>> *occupied = new vector<pair<int, int>>();
-  for (int i = 0; i < (int)nests.size(); i++) {
+  for (int i = 0; i < (int)nests.size(); ++i) {
     occupied->push_back(make_pair(nests[i]->get_x(), nests[i]->get_y()));
     vector<Ant *> ants = nests[i]->get_ants();
-    for (int j = 0; j < (int)ants.size(); j++) {
+    for (int j = 0; j < (int)ants.size(); ++j) {
       occupied->push_back(make_pair(ants[j]->get_x(), ants[j]->get_y()));
     }
   }
-  for (int k = 0; k < (int)crumbs.size(); k++)
-    occupied->push_back(make_pair(crumbs[k]->get_x(), crumbs[k]->get_y()));
   return occupied;
 }
 
@@ -108,10 +108,24 @@ vector<pair<int, int>> *World::get_empty_positions() {
 
 void World::set_configured(string command) { configured.push_back(command); }
 
-void World::remove_nest(Nest *n) {
-  nests.erase(nests.begin() + n->get_nserie());
+bool World::remove_nest(int n) {
+  for (int i = 0; i < (int)nests.size(); ++i) {
+    if (nests[i]->get_nserie() == n) {
+      delete nests[i];
+      nests.erase(nests.begin() + i);
+      return true;
+    }
+  }
+  return false;
 }
 
-void World::remove_crumb(Crumb *c) {
-  crumbs.erase(crumbs.begin() + c->get_nserie());
+bool World::remove_crumb(int c) {
+  for (int i = 0; i < (int)crumbs.size(); ++i) {
+    if (crumbs[i]->get_nserie() == c) {
+      delete nests[i];
+      crumbs.erase(crumbs.begin() + i);
+      return true;
+    }
+  }
+  return false;
 }

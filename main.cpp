@@ -12,6 +12,8 @@ int main() {
   World *world = new World(30, 30);
 
   Consola::clrscr();
+  Consola::setBackgroundColor(0);
+  Consola::setTextColor(7);
 
   cout << "Digite [help] para ver a lista de comandos disponiveis" << endl
        << endl;

@@ -25,35 +25,20 @@ void move_ant(Ant *a, int x, int y) {
   switch (type) {
   case 'E':
     a->set_energy(a->get_energy() - (1 + effective_movement));
-    if (a->get_energy() <= 0) {
-      delete a;
-    }
     break;
   case 'C':
     if (a->get_x() != a->get_nest()->get_x() &&
         a->get_y() != a->get_nest()->get_y())
       a->set_energy(a->get_energy() - (1 + effective_movement));
-    if (a->get_energy() <= 0) {
-      delete a;
-    }
     break;
   case 'V':
     a->set_energy(a->get_energy() - (1 + effective_movement));
-    if (a->get_energy() <= 0) {
-      delete a;
-    }
     break;
   case 'A':
     a->set_energy(a->get_energy() - (1 + 2 * effective_movement));
-    if (a->get_energy() <= 0) {
-      delete a;
-    }
     break;
   case 'S':
     a->set_energy(a->get_energy() - (effective_movement));
-    if (a->get_energy() <= 0) {
-      delete a;
-    }
     break;
   }
 }

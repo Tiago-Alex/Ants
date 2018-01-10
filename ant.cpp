@@ -16,9 +16,7 @@ Ant::Ant(int x, int y, Nest *n) : nserie(sequence++) {
   nest->add_ant(this);
 }
 
-Ant::~Ant() {
-  nest->remove_ant(this);
-}
+Ant::~Ant() {}
 
 string Ant::get_info() {
   ostringstream os;

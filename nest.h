@@ -56,7 +56,7 @@ public:
 
   void move_ants();
 
-  void remove_ant(Ant *a);
+  bool remove_ant(int a);
 
   World *get_world() { return world; }
 };
