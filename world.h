@@ -75,7 +75,11 @@ public:
 
   vector<pair<int, int>> *get_occupied_positions();
 
+  vector<pair<int, int>> *get_occupied_positions_with_crumbs();
+
   vector<pair<int, int>> *get_empty_positions();
+
+  vector<pair<int, int>> *get_empty_positions_with_crumbs();
 
   void set_configured(string command);
 

@@ -119,7 +119,37 @@ void iteration(World *w) {
       vector<Ant *> ants = nests[i]->get_ants();
       if (ants.size() > 0)
         for (int j = 0; j < (int)ants.size(); ++j) {
-          RideRule(w, ants[j]);
+          switch (ants[j]->get_type()) {
+          case 'E':
+            EatCrumbRule(ants[j]);
+            RideRule(ants[j]);
+            break;
+          case 'C':
+            RunRule(ants[j]);
+            EatCrumbRule(ants[j]);
+            SearchCrumbRule(ants[j]);
+            GoToNestRule(ants[j]);
+            RideRule(ants[j]);
+            break;
+          case 'V':
+            ProtectRule(ants[j]);
+            EatCrumbRule(ants[j]);
+            SearchCrumbRule(ants[j]);
+            RideRule(ants[j]);
+            break;
+          case 'A':
+            RobsRule(ants[j]);
+            ChasesRule(ants[j]);
+            EatCrumbRule(ants[j]);
+            SearchCrumbRule(ants[j]);
+            RideRule(ants[j]);
+            break;
+          case 'S':
+            ChasesRule(ants[j]);
+            RobsRule(ants[j]);
+            RideRule(ants[j]);
+            break;
+          }
           if (ants[j]->get_energy() <= 0) {
             nests[i]->remove_ant(ants[j]->get_nserie());
           }
@@ -142,7 +172,7 @@ bool define_nests_uenergy(int uenergy, World *w) {
   return true;
 }
 
-bool define_nests_cenergy(int cenergy, World *w) {
+bool define_crumbs_energy(int cenergy, World *w) {
   w->set_default_cenergy(cenergy);
   return true;
 }
@@ -153,10 +183,9 @@ bool define_max_crumbs_per_iteration(int c, World *w) {
 }
 
 bool define_perc_of_crumbs(int n, World *w) {
-  vector<pair<int, int>> *empty = w->get_empty_positions();
   for (int i = 0; i < n; ++i) {
+    vector<pair<int, int>> *empty = w->get_empty_positions_with_crumbs();
     pair<int, int> random = empty->at(random_number((int)empty->size()));
-    empty->push_back(random);
     new Crumb(random.first, random.second, w);
   }
   return true;
@@ -453,7 +482,7 @@ bool configuration(vector<string> arg, World *w) {
     }
   } else if (arg[0] == "defme") {
     if (check_args(arg, 2)) {
-      if (define_nests_cenergy(stoi(arg[1]), w)) {
+      if (define_crumbs_energy(stoi(arg[1]), w)) {
         w->set_configured("defme");
       }
     }
