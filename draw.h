@@ -4,13 +4,14 @@
 #include "windows.h"
 #include "world.h"
 
-COORD GetConsoleCursorPosition();
 class World;
 
-void refresh_world(World *w);
-
-void draw(int x, int y, const char *c, World *w, int color);
-
-void draw_world(World *w);
+class Draw {
+public:
+  static void draw_world(World *w);
+  static void draw(int x, int y, const char *c, World *w, int color);
+  static COORD GetConsoleCursorPosition();
+  static void refresh_world(World *w);
+};
 
 #endif

@@ -4,7 +4,7 @@
 
 using namespace std;
 
-COORD GetConsoleCursorPosition() {
+COORD Draw::GetConsoleCursorPosition() {
   static const HANDLE hOut =
       GetStdHandle(STD_OUTPUT_HANDLE); // vai buscar o conteudo da consola
 
@@ -15,13 +15,12 @@ COORD GetConsoleCursorPosition() {
     coord = cbsi.dwCursorPosition;
     return coord;
   } else {
-    // The function failed. Call GetLastError() for details.
     COORD invalid = {0, 0};
     return invalid;
   }
 }
 
-void refresh_world(World *w) {
+void Draw::refresh_world(World *w) {
   Consola::clrscr();
   draw_world(w);
   vector<Nest *> nests = w->get_nests();
@@ -71,7 +70,7 @@ void refresh_world(World *w) {
   }
 }
 
-void draw(int x, int y, const char *c, World *w, int color) {
+void Draw::draw(int x, int y, const char *c, World *w, int color) {
   Consola::setBackgroundColor(color);
   COORD coord = GetConsoleCursorPosition();
   int height = (int)coord.Y;
@@ -81,7 +80,7 @@ void draw(int x, int y, const char *c, World *w, int color) {
   Consola::setBackgroundColor(0);
 }
 
-void draw_world(World *w) {
+void Draw::draw_world(World *w) {
   int x = w->get_world_width();
   int y = w->get_world_height();
   for (int i = 1; i < x + 1; i++) {

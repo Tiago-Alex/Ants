@@ -100,8 +100,19 @@ vector<pair<int, int>> *World::get_occupied_positions_with_crumbs() {
       occupied->push_back(make_pair(ants[j]->get_x(), ants[j]->get_y()));
     }
   }
-  for (int i = 0; i < (int)crumbs.size(); ++i){
+  for (int i = 0; i < (int)crumbs.size(); ++i) {
     occupied->push_back(make_pair(crumbs[i]->get_x(), crumbs[i]->get_y()));
+  }
+  return occupied;
+}
+
+vector<pair<int, int>> *World::get_occupied_ants() {
+  vector<pair<int, int>> *occupied = new vector<pair<int, int>>();
+  for (int i = 0; i < (int)nests.size(); ++i) {
+    vector<Ant *> ants = nests[i]->get_ants();
+    for (int j = 0; j < (int)ants.size(); ++j) {
+      occupied->push_back(make_pair(ants[j]->get_x(), ants[j]->get_y()));
+    }
   }
   return occupied;
 }

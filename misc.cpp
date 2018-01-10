@@ -31,58 +31,36 @@ void update_crumbs(World *w) {
   }
 }
 
-void transfer_energy_ant_to_nest(
-    World *w) { // TRANSFERE ENERGIA DA FORMIGA PARA O NINHO
-  vector<Nest *> nests = w->get_nests();
-  for (int i = 0; i < (int)nests.size(); ++i) {
-    vector<Ant *> ants = nests[i]->get_ants();
-    for (int j = 0; j < (int)ants.size(); ++j) {
-      if ((ants[i]->get_x() == nests[i]->get_x() &&
-           ants[i]->get_x() == nests[i]->get_x()) &&
-          ants[i]->get_energy() > 200) {
-        ants[i]->set_energy(ants[i]->get_energy() - w->get_default_uenergy());
-        nests[i]->set_energy(nests[i]->get_energy() + w->get_default_uenergy());
-      }
-    }
-  }
-}
+void create_ant_by_nest_energy(Nest *n) {
+  vector<char> type;
+  type.push_back('E');
+  type.push_back('S');
+  type.push_back('A');
+  type.push_back('C');
+  type.push_back('V');
 
-void create_ant_by_nest_energy(
-    World *w) { // CRIA FORMIGA DE ACORDO COM A ENERGIA DO NINHO
-  vector<Nest *> nests = w->get_nests();
-  for (int i = 0; i < (int)nests.size(); ++i) {
-    if (nests[i]->get_energy() >
-        nests[i]->get_energy() * w->get_default_penergy()) {
-      char type = 'E';
-      Ant *a = NULL;
-      switch (type) {
-      case 'E':
-        a = new ExplorerAnt(nests[i]->get_x(), nests[i]->get_y(),
-                            w->get_nest_from_id(nests[i]->get_nserie()));
-        nests[i]->set_energy(nests[i]->get_energy() - a->get_energy());
-        break;
-      case 'C':
-        a = new CaregiverAnt(nests[i]->get_x(), nests[i]->get_y(),
-                             w->get_nest_from_id(nests[i]->get_nserie()));
-        nests[i]->set_energy(nests[i]->get_energy() - a->get_energy());
-        break;
-      case 'V':
-        a = new VigilantAnt(nests[i]->get_x(), nests[i]->get_y(),
-                            w->get_nest_from_id(nests[i]->get_nserie()));
-        nests[i]->set_energy(nests[i]->get_energy() - a->get_energy());
-        break;
-      case 'A':
-        a = new BurglarAnt(nests[i]->get_x(), nests[i]->get_y(),
-                           w->get_nest_from_id(nests[i]->get_nserie()));
-        nests[i]->set_energy(nests[i]->get_energy() - a->get_energy());
-        break;
-      case 'S':
-        a = new SurpriseAnt(nests[i]->get_x(), nests[i]->get_y(),
-                            w->get_nest_from_id(nests[i]->get_nserie()));
-        nests[i]->set_energy(nests[i]->get_energy() - a->get_energy());
-        break;
-      }
-    }
+  Ant *a = NULL;
+  switch (type[random_number(type.size())]) {
+  case 'E':
+    a = new ExplorerAnt(n->get_x(), n->get_y(), n);
+    n->set_energy(n->get_energy() - a->get_energy());
+    break;
+  case 'C':
+    a = new CaregiverAnt(n->get_x(), n->get_y(), n);
+    n->set_energy(n->get_energy() - a->get_energy());
+    break;
+  case 'V':
+    a = new VigilantAnt(n->get_x(), n->get_y(), n);
+    n->set_energy(n->get_energy() - a->get_energy());
+    break;
+  case 'A':
+    a = new BurglarAnt(n->get_x(), n->get_y(), n);
+    n->set_energy(n->get_energy() - a->get_energy());
+    break;
+  case 'S':
+    a = new SurpriseAnt(n->get_x(), n->get_y(), n);
+    n->set_energy(n->get_energy() - a->get_energy());
+    break;
   }
 }
 
@@ -116,6 +94,17 @@ void iteration(World *w) {
   vector<Nest *> nests = w->get_nests();
   if (nests.size() > 0)
     for (int i = 0; i < (int)nests.size(); ++i) {
+
+      if (nests[i]->get_energy() >
+          (w->get_default_energy() * (w->get_default_penergy() / 100))) {
+        pair<int, int> coordinates(nests[i]->get_x(), nests[i]->get_y());
+        vector<pair<int, int> > *occupied = w->get_occupied_ants();
+        if ((find(occupied->begin(), occupied->end(), coordinates) !=
+             occupied->end()) == false) {
+          create_ant_by_nest_energy(nests[i]);
+        }
+      }
+
       vector<Ant *> ants = nests[i]->get_ants();
       if (ants.size() > 0)
         for (int j = 0; j < (int)ants.size(); ++j) {
@@ -185,8 +174,10 @@ bool define_max_crumbs_per_iteration(int c, World *w) {
 bool define_perc_of_crumbs(int n, World *w) {
   for (int i = 0; i < n; ++i) {
     vector<pair<int, int>> *empty = w->get_empty_positions_with_crumbs();
-    pair<int, int> random = empty->at(random_number((int)empty->size()));
-    new Crumb(random.first, random.second, w);
+    if (empty->size() > 0) {
+      pair<int, int> random = empty->at(random_number((int)empty->size()));
+      new Crumb(random.first, random.second, w);
+    }
   }
   return true;
 }
@@ -272,25 +263,28 @@ not we add it to a vector of pairs called the empty positions, next we
 randomize a number from the index of the vector and select from there */
 
     vector<pair<int, int>> *empty = w->get_empty_positions();
-    pair<int, int> random = empty->at(random_number((int)empty->size()));
-    switch (type[0]) {
-    case 'E':
-      new ExplorerAnt(random.first, random.second, nest);
-      break;
-    case 'C':
-      new CaregiverAnt(random.first, random.second, nest);
-      break;
-    case 'V':
-      new VigilantAnt(random.first, random.second, nest);
-      break;
-    case 'A':
-      new BurglarAnt(random.first, random.second, nest);
-      break;
-    case 'S':
-      new SurpriseAnt(random.first, random.second, nest);
-      break;
+
+    if (empty->size() > 0) {
+      pair<int, int> random = empty->at(random_number((int)empty->size()));
+      switch (type[0]) {
+      case 'E':
+        new ExplorerAnt(random.first, random.second, nest);
+        break;
+      case 'C':
+        new CaregiverAnt(random.first, random.second, nest);
+        break;
+      case 'V':
+        new VigilantAnt(random.first, random.second, nest);
+        break;
+      case 'A':
+        new BurglarAnt(random.first, random.second, nest);
+        break;
+      case 'S':
+        new SurpriseAnt(random.first, random.second, nest);
+        break;
+      }
+      return true;
     }
-    return true;
   } else
     cout << "Ninho nao encontrado" << endl;
   return false;
@@ -333,14 +327,7 @@ bool create_ant_1(World *w, const char *type, int n, int x, int y) {
 
 bool create_nest(int x, int y, World *w) {
   pair<int, int> coordinates(x, y);
-  vector<pair<int, int>> *occupied = w->get_occupied_positions();
-  // Adicionar as migalhas aos ocupados, pois os ninhos nao podem havitar no seu
-  // sitio
-  vector<Crumb *> crumbs = w->get_crumbs();
-  for (int i = 0; i < (int)crumbs.size(); ++i) {
-    pair<int, int> occ(crumbs[i]->get_x(), crumbs[i]->get_y());
-    occupied->push_back(occ);
-  }
+  vector<pair<int, int>> *occupied = w->get_occupied_positions_with_crumbs();
   if ((find(occupied->begin(), occupied->end(), coordinates) !=
        occupied->end()) == false) {
     if (y < w->get_world_width() && x < w->get_world_height()) {
@@ -358,14 +345,7 @@ bool create_nest(int x, int y, World *w) {
 
 bool create_crumb(int x, int y, World *w) {
   pair<int, int> coordinates(x, y);
-  vector<pair<int, int>> *occupied = w->get_occupied_positions();
-  // Adicionar as migalhas aos ocupados, pois as migalhas devem sobrepor-se umas
-  // às outras
-  vector<Crumb *> crumbs = w->get_crumbs();
-  for (int i = 0; i < (int)crumbs.size(); ++i) {
-    pair<int, int> occ(crumbs[i]->get_x(), crumbs[i]->get_y());
-    occupied->push_back(occ);
-  }
+  vector<pair<int, int>> *occupied = w->get_occupied_positions_with_crumbs();
   if ((find(occupied->begin(), occupied->end(), coordinates) !=
        occupied->end()) == false) {
     if (y < w->get_world_width() && x < w->get_world_height()) {
@@ -497,8 +477,8 @@ bool configuration(vector<string> arg, World *w) {
     if (configured(w)) {
       cout << "Configuracao concluida" << endl;
       Consola::clrscr();
-      draw_world(w);
-      refresh_world(w);
+      Draw::draw_world(w);
+      Draw::refresh_world(w);
     } else
       cout << "O mundo nao esta totalmente configurado" << endl;
   } else {
@@ -511,25 +491,25 @@ bool simulation(vector<string> arg, World *w) {
   if (arg[0] == "ninho") {
     if (check_args(arg, 3)) {
       if (create_nest(stoi(arg[1]), stoi(arg[2]), w))
-        refresh_world(w);
+        Draw::refresh_world(w);
     }
   } else if (arg[0] == "criaf") {
     if (check_args(arg, 4)) {
       for (int i = 0; i < stoi(arg[1]); ++i) {
         create_ant(w, arg[2].c_str(), stoi(arg[3]));
       }
-      refresh_world(w);
+      Draw::refresh_world(w);
     }
   } else if (arg[0] == "cria1") {
     if (check_args(arg, 5)) {
       if (create_ant_1(w, arg[1].c_str(), stoi(arg[2]), stoi(arg[3]),
                        stoi(arg[4])))
-        refresh_world(w);
+        Draw::refresh_world(w);
     }
   } else if (arg[0] == "migalha") {
     if (check_args(arg, 3)) {
       if (create_crumb(stoi(arg[1]), stoi(arg[2]), w))
-        refresh_world(w);
+        Draw::refresh_world(w);
     }
   } else if (arg[0] == "energninho") {
     vector<Nest *> nests = w->get_nests();
@@ -554,7 +534,7 @@ bool simulation(vector<string> arg, World *w) {
   } else if (arg[0] == "mata") {
     if (check_args(arg, 3)) {
       if (remove_ant(stoi(arg[1]), stoi(arg[2]), w))
-        refresh_world(w);
+        Draw::refresh_world(w);
       else
         cout << "Erro ao eliminar formiga" << endl;
     }
@@ -562,7 +542,7 @@ bool simulation(vector<string> arg, World *w) {
     if (check_args(arg, 2)) {
       if (w->remove_nest(stoi(arg[1])) == true) {
         cout << "Ninho eliminado com sucesso!" << endl;
-        refresh_world(w);
+        Draw::refresh_world(w);
       } else {
         cout << "Erro a eliminar ninho" << endl;
       }
@@ -573,11 +553,11 @@ bool simulation(vector<string> arg, World *w) {
         iteration(w);
         decrease_crumbs_energy(w);
       }
-      refresh_world(w);
+      Draw::refresh_world(w);
     } else {
       iteration(w);
       decrease_crumbs_energy(w);
-      refresh_world(w);
+      Draw::refresh_world(w);
     }
   } else if (arg[0] == "listamundo") {
     list_world(w);
@@ -608,7 +588,7 @@ bool simulation(vector<string> arg, World *w) {
       file.close();
     }
   } else if (arg[0] == "muda") {
-    refresh_world(w);
+    Draw::refresh_world(w);
   } else { // FALTA GUARDAR E MUDAR UMA CÓPIA DO MUNDO!
     return false;
   }
