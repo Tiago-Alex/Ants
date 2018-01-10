@@ -10,7 +10,7 @@
 
 using namespace std;
 
-void Rules::move_ant(Ant *a, int x, int y) {
+void move_ant(Ant *a, int x, int y) {
 
   a->set_iterations(a->get_iterations() + 1);
 
@@ -68,7 +68,7 @@ void Rules::move_ant(Ant *a, int x, int y) {
   }
 }
 
-void Rules::aprroach_ray(Ant *a, int x, int y, bool run_away = false) {
+void aprroach_ray(Ant *a, int x, int y, bool run_away = false) {
 
   World *w = a->get_nest()->get_world();
 
@@ -129,7 +129,7 @@ void Rules::aprroach_ray(Ant *a, int x, int y, bool run_away = false) {
   }
 }
 
-void Rules::EatCrumbRule(Ant *a) {
+void EatCrumbRule(Ant *a) {
   char type = a->get_type();
   vector<Crumb *> crumbs = a->get_nest()->get_world()->get_crumbs();
   int energy = 0;
@@ -191,7 +191,7 @@ void Rules::EatCrumbRule(Ant *a) {
   }
 }
 
-void Rules::RunRule(Ant *a) {
+void RunRule(Ant *a) {
   World *w = a->get_nest()->get_world();
   vector<Nest *> nests = w->get_nests();
 
@@ -213,7 +213,7 @@ void Rules::RunRule(Ant *a) {
   }
 }
 
-void Rules::ChasesRule(Ant *a) {
+void ChasesRule(Ant *a) {
   int max_energy = 0;
   World *w = a->get_nest()->get_world();
   pair<int, int> aux;
@@ -239,7 +239,7 @@ void Rules::ChasesRule(Ant *a) {
   aprroach_ray(a, aux.first, aux.second, false);
 }
 
-void Rules::RobsRule(Ant *a) {
+void RobsRule(Ant *a) {
   int max_energy = 0;
   bool touched = false;
   World *w = a->get_nest()->get_world();
@@ -271,7 +271,7 @@ void Rules::RobsRule(Ant *a) {
   }
 }
 
-void Rules::ProtectRule(Ant *a) {
+void ProtectRule(Ant *a) {
   World *w = a->get_nest()->get_world();
 
   pair<int, int> coordinates1;
@@ -307,7 +307,7 @@ void Rules::ProtectRule(Ant *a) {
     }
 }
 
-void Rules::SearchCrumbRule(Ant *a) {
+void SearchCrumbRule(Ant *a) {
   World *w = a->get_nest()->get_world();
 
   int max_energy = 0;
@@ -333,7 +333,7 @@ void Rules::SearchCrumbRule(Ant *a) {
     aprroach_ray(a, c->get_x(), c->get_y(), false);
 }
 
-void Rules::GoToNestRule(Ant *a) {
+void GoToNestRule(Ant *a) {
   int energy = a->get_energy();
   int initial_energy;
   switch (a->get_type()) {
@@ -380,7 +380,7 @@ void Rules::GoToNestRule(Ant *a) {
   }
 }
 
-void Rules::RideRule(Ant *a) {
+void RideRule(Ant *a) {
   World *w = a->get_nest()->get_world();
 
   vector<pair<int, int>> *empty = w->get_empty_positions();
