@@ -98,7 +98,7 @@ void iteration(World *w) {
       if (nests[i]->get_energy() >
           (w->get_default_energy() * (w->get_default_penergy() / 100))) {
         pair<int, int> coordinates(nests[i]->get_x(), nests[i]->get_y());
-        vector<pair<int, int> > *occupied = w->get_occupied_ants();
+        vector<pair<int, int>> *occupied = w->get_occupied_ants();
         if ((find(occupied->begin(), occupied->end(), coordinates) !=
              occupied->end()) == false) {
           create_ant_by_nest_energy(nests[i]);
@@ -106,37 +106,38 @@ void iteration(World *w) {
       }
 
       vector<Ant *> ants = nests[i]->get_ants();
+      Rules *rules = new Rules();
       if (ants.size() > 0)
         for (int j = 0; j < (int)ants.size(); ++j) {
           switch (ants[j]->get_type()) {
           case 'E':
-            EatCrumbRule(ants[j]);
-            RideRule(ants[j]);
+            rules->EatCrumbRule(ants[j]);
+            rules->RideRule(ants[j]);
             break;
           case 'C':
-            RunRule(ants[j]);
-            EatCrumbRule(ants[j]);
-            SearchCrumbRule(ants[j]);
-            GoToNestRule(ants[j]);
-            RideRule(ants[j]);
+            rules->RunRule(ants[j]);
+            rules->EatCrumbRule(ants[j]);
+            rules->SearchCrumbRule(ants[j]);
+            rules->GoToNestRule(ants[j]);
+            rules->RideRule(ants[j]);
             break;
           case 'V':
-            ProtectRule(ants[j]);
-            EatCrumbRule(ants[j]);
-            SearchCrumbRule(ants[j]);
-            RideRule(ants[j]);
+            rules->ProtectRule(ants[j]);
+            rules->EatCrumbRule(ants[j]);
+            rules->SearchCrumbRule(ants[j]);
+            rules->RideRule(ants[j]);
             break;
           case 'A':
-            RobsRule(ants[j]);
-            ChasesRule(ants[j]);
-            EatCrumbRule(ants[j]);
-            SearchCrumbRule(ants[j]);
-            RideRule(ants[j]);
+            rules->RobsRule(ants[j]);
+            rules->ChasesRule(ants[j]);
+            rules->EatCrumbRule(ants[j]);
+            rules->SearchCrumbRule(ants[j]);
+            rules->RideRule(ants[j]);
             break;
           case 'S':
-            ChasesRule(ants[j]);
-            RobsRule(ants[j]);
-            RideRule(ants[j]);
+            rules->ChasesRule(ants[j]);
+            rules->RobsRule(ants[j]);
+            rules->RideRule(ants[j]);
             break;
           }
           if (ants[j]->get_energy() <= 0) {

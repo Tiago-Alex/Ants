@@ -10,7 +10,65 @@
 
 using namespace std;
 
-void aprroach_ray(Ant *a, int x, int y, bool run_away = false) {
+void Rules::move_ant(Ant *a, int x, int y) {
+
+  a->set_iterations(a->get_iterations() + 1);
+
+  int old_x = a->get_x();
+  int old_y = a->get_y();
+
+  a->set_x(x);
+  a->set_y(y);
+
+  int effective_movement = abs(old_x - x) + abs(old_y - y);
+
+  char type = a->get_type();
+
+  switch (type) {
+  case 'E':
+    a->set_energy(a->get_energy() - (1 + effective_movement));
+    break;
+  case 'C':
+    if (a->get_x() != a->get_nest()->get_x() &&
+        a->get_y() != a->get_nest()->get_y()) {
+      a->set_energy(a->get_energy() - (1 + effective_movement));
+    } else {
+      if (a->get_energy() > a->get_nest()->get_energy() &&
+          a->get_energy() > 200) {
+        int energy = a->get_energy() - 200;
+        a->set_energy(energy);
+        a->get_nest()->set_energy(energy + a->get_nest()->get_energy());
+      } else if (a->get_nest()->get_energy() >
+                 a->get_nest()->get_world()->get_default_energy()) {
+        int energy = a->get_nest()->get_energy() -
+                     a->get_nest()->get_world()->get_default_energy();
+        a->get_nest()->set_energy(energy);
+        a->set_energy(a->get_energy() + energy);
+      } else if ((a->get_energy() < 100) && (a->get_nest()->get_energy() > 1)) {
+        a->set_energy(a->get_energy() +
+                      a->get_nest()->get_world()->get_default_uenergy());
+        a->get_nest()->set_energy(
+            a->get_energy() -
+            a->get_nest()->get_world()->get_default_uenergy());
+      } else if ((a->get_energy() > 100 && a->get_energy() < 200) ||
+                 (a->get_nest()->get_energy() > 1)) {
+        aprroach_ray(a, a->get_x(), a->get_y(), false);
+      }
+    }
+    break;
+  case 'V':
+    a->set_energy(a->get_energy() - (1 + effective_movement));
+    break;
+  case 'A':
+    a->set_energy(a->get_energy() - (1 + 2 * effective_movement));
+    break;
+  case 'S':
+    a->set_energy(a->get_energy() - (effective_movement));
+    break;
+  }
+}
+
+void Rules::aprroach_ray(Ant *a, int x, int y, bool run_away = false) {
 
   World *w = a->get_nest()->get_world();
 
@@ -71,65 +129,7 @@ void aprroach_ray(Ant *a, int x, int y, bool run_away = false) {
   }
 }
 
-void move_ant(Ant *a, int x, int y) {
-
-  a->set_iterations(a->get_iterations() + 1);
-
-  int old_x = a->get_x();
-  int old_y = a->get_y();
-
-  a->set_x(x);
-  a->set_y(y);
-
-  int effective_movement = abs(old_x - x) + abs(old_y - y);
-
-  char type = a->get_type();
-
-  switch (type) {
-  case 'E':
-    a->set_energy(a->get_energy() - (1 + effective_movement));
-    break;
-  case 'C':
-    if (a->get_x() != a->get_nest()->get_x() &&
-        a->get_y() != a->get_nest()->get_y()) {
-      a->set_energy(a->get_energy() - (1 + effective_movement));
-    } else {
-      if (a->get_energy() > a->get_nest()->get_energy() &&
-          a->get_energy() > 200) {
-        int energy = a->get_energy() - 200;
-        a->set_energy(energy);
-        a->get_nest()->set_energy(energy + a->get_nest()->get_energy());
-      } else if (a->get_nest()->get_energy() >
-                 a->get_nest()->get_world()->get_default_energy()) {
-        int energy = a->get_nest()->get_energy() -
-                     a->get_nest()->get_world()->get_default_energy();
-        a->get_nest()->set_energy(energy);
-        a->set_energy(a->get_energy() + energy);
-      } else if ((a->get_energy() < 100) && (a->get_nest()->get_energy() > 1)) {
-        a->set_energy(a->get_energy() +
-                      a->get_nest()->get_world()->get_default_uenergy());
-        a->get_nest()->set_energy(
-            a->get_energy() -
-            a->get_nest()->get_world()->get_default_uenergy());
-      } else if ((a->get_energy() > 100 && a->get_energy() < 200) ||
-                 (a->get_nest()->get_energy() > 1)) {
-        aprroach_ray(a, a->get_x(), a->get_y());
-      }
-    }
-    break;
-  case 'V':
-    a->set_energy(a->get_energy() - (1 + effective_movement));
-    break;
-  case 'A':
-    a->set_energy(a->get_energy() - (1 + 2 * effective_movement));
-    break;
-  case 'S':
-    a->set_energy(a->get_energy() - (effective_movement));
-    break;
-  }
-}
-
-void EatCrumbRule(Ant *a) {
+void Rules::EatCrumbRule(Ant *a) {
   char type = a->get_type();
   vector<Crumb *> crumbs = a->get_nest()->get_world()->get_crumbs();
   int energy = 0;
@@ -191,7 +191,7 @@ void EatCrumbRule(Ant *a) {
   }
 }
 
-void RunRule(Ant *a) {
+void Rules::RunRule(Ant *a) {
   World *w = a->get_nest()->get_world();
   vector<Nest *> nests = w->get_nests();
 
@@ -213,7 +213,7 @@ void RunRule(Ant *a) {
   }
 }
 
-void ChasesRule(Ant *a) {
+void Rules::ChasesRule(Ant *a) {
   int max_energy = 0;
   World *w = a->get_nest()->get_world();
   pair<int, int> aux;
@@ -236,10 +236,10 @@ void ChasesRule(Ant *a) {
       }
     }
   }
-  aprroach_ray(a, aux.first, aux.second);
+  aprroach_ray(a, aux.first, aux.second, false);
 }
 
-void RobsRule(Ant *a) {
+void Rules::RobsRule(Ant *a) {
   int max_energy = 0;
   bool touched = false;
   World *w = a->get_nest()->get_world();
@@ -271,7 +271,7 @@ void RobsRule(Ant *a) {
   }
 }
 
-void ProtectRule(Ant *a) {
+void Rules::ProtectRule(Ant *a) {
   World *w = a->get_nest()->get_world();
 
   pair<int, int> coordinates1;
@@ -303,11 +303,11 @@ void ProtectRule(Ant *a) {
     if (another_community) {
       int middle_x = abs(coordinates1.first - coordinates2.first) / 2;
       int middle_y = abs(coordinates2.first - coordinates2.first) / 2;
-      aprroach_ray(a, middle_x, middle_y);
+      aprroach_ray(a, middle_x, middle_y, false);
     }
 }
 
-void SearchCrumbRule(Ant *a) {
+void Rules::SearchCrumbRule(Ant *a) {
   World *w = a->get_nest()->get_world();
 
   int max_energy = 0;
@@ -330,10 +330,10 @@ void SearchCrumbRule(Ant *a) {
     }
   }
   if (touched)
-    aprroach_ray(a, c->get_x(), c->get_y());
+    aprroach_ray(a, c->get_x(), c->get_y(), false);
 }
 
-void GoToNestRule(Ant *a) {
+void Rules::GoToNestRule(Ant *a) {
   int energy = a->get_energy();
   int initial_energy;
   switch (a->get_type()) {
@@ -373,14 +373,14 @@ void GoToNestRule(Ant *a) {
                                         (nest->get_y() + range))) {
           move_ant(a, nest->get_x(), nest->get_y());
         } else {
-          aprroach_ray(a, nest->get_x(), nest->get_y());
+          aprroach_ray(a, nest->get_x(), nest->get_y(), false);
         }
       }
     }
   }
 }
 
-void RideRule(Ant *a) {
+void Rules::RideRule(Ant *a) {
   World *w = a->get_nest()->get_world();
 
   vector<pair<int, int>> *empty = w->get_empty_positions();
