@@ -1,4 +1,5 @@
 #include "misc.h"
+#include "universe.h"
 #include "world.h"
 #include <algorithm>
 #include <iostream>
@@ -7,9 +8,10 @@
 
 using namespace std;
 
-World::World(int x, int y) {
+World::World(int x, int y, Universe *u) {
   width = x;
   height = y;
+  universe = u;
 }
 
 void World::set_world_size(int x, int y) {

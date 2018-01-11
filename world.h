@@ -4,6 +4,7 @@
 #include "ant.h"
 #include "crumb.h"
 #include "nest.h"
+#include "universe.h"
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -14,6 +15,8 @@ class Ant;
 class Crumb;
 
 class Nest;
+
+class Universe;
 
 class World {
   int width, height, energy = 0, penergy = 0, uenergy = 1, cenergy = 0,
@@ -27,8 +30,11 @@ class World {
 
   vector<string> configured;
 
+  Universe *universe;
+
 public:
-  World(int x, int y);
+  World(int x, int y, Universe *u);
+
   void set_world_size(int x, int y);
 
   int get_world_width() { return width; }
@@ -94,6 +100,10 @@ public:
   bool remove_crumb(int c);
 
   void set_max_crumbs(int c);
+
+  World *clone() const { return new World(*this); }
+
+  Universe *get_universe() { return universe; }
 };
 
 #endif

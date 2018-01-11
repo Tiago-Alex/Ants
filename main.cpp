@@ -9,7 +9,9 @@ using namespace std;
 
 int main() {
   string cmd;
-  World *world = new World(30, 30);
+  Universe *u = new Universe();
+  World *world = new World(30, 30, u);
+  u->add_world(world, "default");
 
   Consola::clrscr();
   Consola::setBackgroundColor(0);

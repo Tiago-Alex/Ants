@@ -14,6 +14,36 @@
 #include <time.h>
 #include <vector>
 
+void delete_world(World *w, string name) {
+  Universe *u = w->get_universe();
+  u->delete_world(name);
+  if (name == "default")
+    w->reset_configuration();
+}
+
+void restore(World *w, string name) {
+  vector<pair<World *, string>> worlds = w->get_universe()->get_worlds();
+
+  for (int i = 0; i < (int)worlds.size(); ++i) {
+    if (name == worlds[i].second) {
+      w = worlds[i].first;
+      Draw::refresh_world(w);
+      return;
+    }
+  }
+}
+
+void save(World *w, string name) {
+  if (name == "default") {
+    cout << "Nao pode gravar com esse nome" << endl;
+    return;
+  }
+
+  Universe *u = w->get_universe();
+  World *new_world = w->clone();
+  u->add_world(new_world, name);
+}
+
 void decrease_crumbs_energy(World *w) {
   vector<Crumb *> crumbs = w->get_crumbs();
   for (int i = 0; i < (int)crumbs.size(); ++i) {
@@ -571,25 +601,23 @@ bool simulation(vector<string> arg, World *w) {
       list_position(stoi(arg[1]), stoi(arg[2]), w);
   } else if (arg[0] == "apaga") {
     if (check_args(arg, 2)) {
-      if (arg[1] == "commands.txt") {
-        if (remove("commands.txt") != 0)
-          cout << "Erro ao apagar ficheiro" << endl;
-        else {
-          cout << "Ficheiro apagado com sucesso" << endl;
-          w->reset_configuration();
-        }
-      }
+      delete_world(w, arg[1]);
     }
   } else if (arg[0] == "guarda") {
     if (check_args(arg, 2)) {
-      ofstream file;
-      file.open(arg[1]);
-      file.write((char *)(&w), sizeof(World));
-      file.close();
+      save(w, arg[1]);
+      Draw::refresh_world(w);
     }
   } else if (arg[0] == "muda") {
-    Draw::refresh_world(w);
-  } else { // FALTA GUARDAR E MUDAR UMA CÓPIA DO MUNDO!
+    if (check_args(arg, 2)) {
+      restore(w, arg[1]);
+    }
+  } else if (arg[0] == "listamundos") {
+    vector<pair<World *, string>> worlds = w->get_universe()->get_worlds();
+    for (int i = 0; i < (int)worlds.size(); ++i) {
+      cout << worlds[i].second << endl;
+    }
+  } else {
     return false;
   }
   return true;
